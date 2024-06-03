@@ -7,6 +7,10 @@ import glob
 import zipfile
 import json
 import numpy
+import pandas as pd
+import re
+import csv
+
 
 __author__ = "Marine AGLAVE"
 
@@ -18,6 +22,14 @@ sys.stderr.write("\n############################################################
 
 ### parameters ###################################################################################################################################
 sys.stderr.write("\n#################### Setting Parameters ####################\n\n")
+
+#https://stackoverflow.com/questions/72268814/importing-python-function-from-outside-of-the-current-folder
+#rootpath = os.path.join(os.getcwd(), '..')
+#sys.path.append(rootpath)
+
+sys.path.append('/mnt/beegfs/pipelines/single-cell/lr_1.3_test/single-cell/common')
+
+from function_utils import check_delimiter
 
 STEPS = config['Steps']
 PIPELINE_FOLDER = workflow.snakefile
@@ -32,6 +44,7 @@ if os.path.normpath(GLOBAL_TMP) != "/tmp" :
 
 if "Alignment_countTable_GE" in STEPS:
     ### Sample/Project
+    if config["Sequencing_type"] != "short-reads": sys.exit("Error in sequencing_type: please use \'short-reads\'")
     if 'Alignment_countTable_GE' in config and 'sample.name.ge' not in config['Alignment_countTable_GE']: sys.exit("Error: No sample.name.ge in configfile (Alignment_countTable_GE)!")
     if 'Alignment_countTable_GE' in config and 'input.dir.ge' not in config['Alignment_countTable_GE']: sys.exit("Error: No input.dir.ge in configfile (Alignment_countTable_GE)!")
     if 'Alignment_countTable_GE' in config and 'output.dir.ge' not in config['Alignment_countTable_GE']: sys.exit("Error: No output.dir.ge in configfile (Alignment_countTable_GE)!")
@@ -56,6 +69,40 @@ if "Alignment_countTable_GE" in STEPS:
         ALIGN_SYMLINK_FILES_GE = ALIGN_SYMLINK_FILES_GE + [ os.path.normpath(ALIGN_INPUT_DIR_GE + "/" + os.path.basename(file).replace(ALIGN_SAMPLE_NAME_GE_RAW[i], ALIGN_SAMPLE_NAME_GE[i])) for file in ORIG_FILES]
     #files without path and extention
     ALIGN_SYMLINK_FILES_NAME_GE = [os.path.splitext(os.path.splitext(os.path.basename(x))[0])[0] for x in ALIGN_SYMLINK_FILES_GE]
+
+if "Alignment_countTable_LR_GE" in STEPS:
+    if config["Sequencing_type"] != "long-reads": sys.exit("Error in sequencing_type: please use \'long-reads\'")
+    if 'Alignment_countTable_LR_GE' in config and 'sample.name.ge' not in config['Alignment_countTable_LR_GE']: sys.exit("Error: No sample.name.ge in configfile (Alignment_countTable_LR_GE)!")
+    if 'Alignment_countTable_LR_GE' in config and 'output.dir.ge' not in config['Alignment_countTable_LR_GE']: sys.exit("Error: No output.dir.ge in configfile (Alignment_countTable_LR_GE)!")
+    if 'Alignment_countTable_LR_GE' in config and 'design.file.ge' not in config['Alignment_countTable_LR_GE']: sys.exit("Error: No design.file.ge in configfile (Alignment_countTable_LR_GE)!")
+    if 'Alignment_countTable_LR_GE' in config and 'species' not in config['Alignment_countTable_LR_GE']: sys.exit("Error: No species in configfile (Alignment_countTable_LR_GE)!")
+    
+    ALIGN_OUTPUT_DIR_GE = os.path.normpath(config['Alignment_countTable_LR_GE']['output.dir.ge'])
+    ALIGN_SAMPLE_NAME_GE = config['Alignment_countTable_LR_GE']['sample.name.ge']
+    DESIGN_FILE_GE = config['Alignment_countTable_LR_GE']['design.file.ge']
+    
+    if check_delimiter(DESIGN_FILE_GE) != ',':
+        raise SyntaxError("csv design file is not using commas delimiters")
+    else:
+        design_file=pd.read_csv(DESIGN_FILE_GE,sep=',')
+        
+    expected_columns=['sample_id', 'path_to_fastq', 'exp_cells', 'kit_name','kit_version']
+    #check element in both lists : header of the design file and list of expected column
+    header_check=all(x == y for x, y in 
+                     zip(design_file.columns, expected_columns))
+
+    if header_check is not True:
+        raise SyntaxError("Your design file accept only this columns: sample_id, path_to_fastq, exp_cells, kit_name,kit_version")
+        
+    nrow=design_file.shape[0]
+    if nrow < 0:
+     raise ValueError("Your design file is empty")
+    if nrow > len(config['Alignment_countTable_LR_GE']['sample.name.ge']):
+        raise ValueError("Your design file has more sample than expected")
+    
+    design_file_dict=pd.read_csv(DESIGN_FILE_GE).to_dict('records')
+    FASTQ_PATH_GE={i['sample_id']:i['path_to_fastq'] for i in design_file_dict if i['sample_id'] in ALIGN_SAMPLE_NAME_GE}
+    
 
 if "Alignment_countTable_ADT" in STEPS:
     ### Sample/Project
@@ -1103,3 +1150,6 @@ if "Grp_Adding_TCR" in STEPS:
 
 if "Grp_Adding_BCR" in STEPS:
     include: "rules/Grp_Adding_BCR.smk"
+    
+if "Alignment_countTable_LR_GE":
+    include: "rules/Alignment_countTable_LR_GE.smk"
