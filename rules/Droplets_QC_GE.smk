@@ -28,13 +28,16 @@ def QC_droplets_input_ge(wildcards):
 
 def QC_droplets_input_ge_lr(wildcards):
     epi2me_folder = dic_SAMPLE_NAME_GE_INFO[wildcards.sample_name_ge]['QC_INPUT_DIR']
-    if "Alignment_countTable_GE" in STEPS:
+    if "Alignment_countTable_GE_LR" in STEPS:
         mtx_file = os.path.normpath(epi2me_folder + "/" + wildcards.sample_name_ge + ".mtx.gz")
         barcodes_file = os.path.normpath(epi2me_folder + "/" + wildcards.sample_name_ge + ".barcodes.tsv.gz")
         genes_file = os.path.normpath(epi2me_folder + "/" + wildcards.sample_name_ge + ".features.tsv.gz")
         files=[mtx_file, barcodes_file, genes_file]
+    
     else:
         files=[epi2me_folder]
+    print(epi2me_folder)
+    return files
 
 """
 This function allows to determine the input alignment folder for params section.

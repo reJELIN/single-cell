@@ -124,9 +124,8 @@ def get_targets(STEPS):
     if "Alignment_countTable_LR_GE" in STEPS:
         targets["Alignment_countTable_LR_GE"]=[
         expand(ALIGN_OUTPUT_DIR_GE+"/samplesheet/{sample_name_ge}_samplesheet.csv",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
-        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/{sample_name_ge}.gene_expression.counts.tsv",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
-        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/{sample_name_ge}.transcript_expression.counts.tsv",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
-        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/{sample_name_ge}_GE.tsv.gz",sample_name_ge=ALIGN_SAMPLE_NAME_GE)
+        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/gene_raw_feature_bc_matrix/matrix.mtx.gz",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
+        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/transcript_raw_feature_bc_matrix/matrix.mtx.gz",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
         ]
 
     return targets
