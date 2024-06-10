@@ -63,16 +63,23 @@ create.parallel.instance <- function(nthreads = 1) {
 # 4) Remove empty droplets
 # 5) Plotting saturation and Kneeplot
 # 6) Creation of the Seurat object
-load.sc.data <- function(data.path = NULL, sample.name = NULL, assay = 'RNA', droplets.limit = 1E+05, emptydrops.fdr = 1E+03, emptydrops.retain = NULL, return.matrix = FALSE, translation = FALSE, translation.file = NULL, BPPARAM = BiocParallel::SerialParam(), my.seed = 1337, out.dir = NULL, draw_plots = TRUE, metadata.file = NULL) {
+load.sc.data <- function(data.path = NULL, sample.name = NULL, assay = 'RNA', droplets.limit = 1E+05, emptydrops.fdr = 1E+03, emptydrops.retain = NULL, return.matrix = FALSE, translation = FALSE, translation.file = NULL, BPPARAM = BiocParallel::SerialParam(), my.seed = 1337, out.dir = NULL, draw_plots = TRUE, metadata.file = NULL,sequencing_type = NULL) {
   if (file.exists(data.path) && !is.null(sample.name)) {
     message("Loading data ...")
 
     ## Loading data
     source.format <- ""
-    if(file.exists(paste0(data.path, "/matrix.mtx"))) { ### Cell Ranger
+    if(file.exists(paste0(data.path, "/matrix.mtx")) & sequencing_type == "short-reads") { ### Cell Ranger
       source.format <- "CellRanger"
       scmat <- Seurat::Read10X(data.path)
       if ('Gene Expression' %in% names (scmat)) {
+        message("Keeping only gene expression")
+        scmat <- scmat[['Gene Expression']]
+      }
+    } else if(file.exists(paste0(data.path, "/matrix.mtx.gz")) & sequencing_type == "long-reads") {
+        source.format <- "Epi2melab wf-single-cell"
+        scmat <- Seurat::Read10X(data.path)
+          if ('Gene Expression' %in% names (scmat)) {
         message("Keeping only gene expression")
         scmat <- scmat[['Gene Expression']]
       }

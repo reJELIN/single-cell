@@ -37,7 +37,9 @@ option_list <- list(
   # Translation into gene Symbols
   make_option("--translation.file", help="Text file with correspondance ENSG / genes symbol"),
   # Yaml parameters file to remplace all parameters before (to use R script without snakemake)
-  make_option("--yaml", help="Patho to yaml file with all parameters")
+  make_option("--yaml", help="Path to yaml file with all parameters"),
+  make_option("--sequencing_type", help="sequencing type short-reads or long-reads")
+  
 )
 parser <- OptionParser(usage="Rscript %prog [options]", description = " ", option_list = option_list)
 args <- parse_args(parser, positional_arguments = 0)
@@ -87,6 +89,7 @@ crb.genes.file <- args$options$crb.genes.file
 str.genes.file <- args$options$str.genes.file
 # Translation into gene Symbols
 translation.file <- args$options$translation.file
+sequencing_type_info <- args$options$sequencing_type
 
 ### Yaml parameters file to remplace all parameters before (usefull to use R script without snakemake)
 if (!is.null(args$options$yaml)){
@@ -193,7 +196,7 @@ unfiltred.dir <- paste0(output.dir.ge, 'QC_droplets', if(!is.null(emptydrops.ret
 dir.create(path = unfiltred.dir, recursive = TRUE, showWarnings = FALSE)
 
 ### Loading raw count matrix + Filtering duplicated cell barcodes + Removing empty droplets
-sobj <- load.sc.data(data.path = input.dir.ge, sample.name = sample.name.GE, assay = assay, droplets.limit = droplets.limit, emptydrops.fdr = emptydrops.fdr, emptydrops.retain = emptydrops.retain, translation = translation, translation.file = translation.file, BPPARAM = cl, my.seed = my.seed, out.dir = unfiltred.dir)
+sobj <- load.sc.data(data.path = input.dir.ge, sample.name = sample.name.GE, assay = assay, droplets.limit = droplets.limit, emptydrops.fdr = emptydrops.fdr, emptydrops.retain = emptydrops.retain, translation = translation, translation.file = translation.file, BPPARAM = cl, my.seed = my.seed, out.dir = unfiltred.dir,sequencing_type = sequencing_type_info)
 
 ### Add metadata
 if(!is.null(metadata.file)) sobj <- add_metadata_sobj(sobj=sobj, metadata.file = metadata.file)

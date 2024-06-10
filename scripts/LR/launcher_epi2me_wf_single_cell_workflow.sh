@@ -30,7 +30,7 @@ module load singularity/3.6.3
 export TMPDIR=/tmp/
 
 #parameters
-pipeline_version="v0.2.2"
+pipeline_version="v2.0.3"
 path_to_pipeline="/mnt/beegfs/pipelines/wf-scLongReads_Nanopore/"${pipeline_version}"/wf-single-cell/"
 
 mkdir -p ${output_dir_path}
@@ -41,15 +41,11 @@ nextflow run ${path_to_pipeline} \
     -w ${output_dir_path}/workspace \
     -profile singularity \
     --fastq ${fastq_dir_path} \
-    --max_threads 48 \
-    --resources_mm2_max_threads 4 \
-    --matrix_max_mito 100 \
-    --umi_cell_gene_max_reads 100000 \
+    --threads 48 \
     --single_cell_sample_sheet ${sample_sheet} \
     --ref_genome_dir ${ref_genome_dir} \
     --matrix_min_genes ${min_genes} \
     --matrix_min_cells ${min_cells} \
     --matrix_max_mito ${max_mito} \
     --out_dir ${output_dir_path} \
-    --plot_umaps \
     -with-report nextflow_report_${sample_name}.html -with-trace -with-timeline nextflow_timeline_${sample_name}.html -with-dag nextflow_flowchart_${sample_name}.png -resume

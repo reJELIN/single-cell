@@ -9,7 +9,7 @@ except KeyError:
 try:
     max_mito=config["Alignment_countTable_LR_GE"]["max.mito"]
 except KeyError:
-    max_mito=1
+    max_mito=100
 try:
     species=config["Alignment_countTable_LR_GE"]["species"]
 except KeyError:
@@ -52,7 +52,7 @@ rule create_sample_sheet:
 
 """
 #################################################################################################################
-These rule launch the epi2melab wf single-cell workflow
+These rule launch the epi2melab wf single-cell workflowdata
 #################################################################################################################
 """
 
@@ -61,11 +61,11 @@ rule alignment_inputs_ge_lr:
         ref_genome_dir=ref_genome_dir,
         samplesheet=ALIGN_OUTPUT_DIR_GE+"/samplesheet/{sample_name_ge}_samplesheet.csv"
     output:
-        genes_counts_matrix=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/{sample_name_ge}.gene_expression.counts.tsv",
-        transcript_counts_matrix=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/{sample_name_ge}.transcript_expression.counts.tsv"
+        genes_counts_matrix=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/gene_raw_feature_bc_matrix/matrix.mtx.gz",
+        transcript_counts_matrix=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/transcript_raw_feature_bc_matrix/matrix.mtx.gz"
     resources:
-        mem_mb = (lambda wildcards, attempt: min(attempt * 300000, 356000)),
-        time_min = (lambda wildcards, attempt: min(attempt * 2880, 5760))
+        mem_mb = (lambda wildcards, attempt: min(attempt * 150000, 300000)),
+        time_min = (lambda wildcards, attempt: min(attempt * 2880, 10080))
     threads:
         48
     params:
@@ -88,28 +88,4 @@ rule alignment_inputs_ge_lr:
         -o {params.output_path} \
         -n {params.sample_id} \
         -f {params.fastq_path}
-        """
-
-"""
-#################################################################################################################
-These rule compress and rename the gene expression counts matrix in order to make it work with the srsc pipeline
-#################################################################################################################
-"""
-
-rule compress_and_rename:
-    input:
-        genes_counts_matrix=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/{sample_name_ge}.gene_expression.counts.tsv"
-    output:
-        umi_tools=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/{sample_name_ge}_GE.tsv.gz"
-    resources:
-        mem_mb = (lambda wildcards, attempt: min(attempt * 256, 2048)),
-        time_min = (lambda wildcards, attempt: min(attempt * 1, 5))
-    threads:
-        1
-    params:
-        output_path=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/"
-    shell:
-        """
-        bzip2 -kz {input.genes_counts_matrix}
-        mv {input.genes_counts_matrix}.bz2 {params.output_path}/{sample_name_ge}/{sample_name_ge}_GE.tsv.gz
         """
