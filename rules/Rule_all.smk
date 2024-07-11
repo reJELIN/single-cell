@@ -127,5 +127,15 @@ def get_targets(STEPS):
         expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/gene_raw_feature_bc_matrix/matrix.mtx.gz",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
         expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/transcript_raw_feature_bc_matrix/matrix.mtx.gz",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
         ]
-
+        
+    if "Isoform_Markers_GE" in STEPS and "Clust_Markers_Annot_GE" in STEPS:
+        targets["Isoform_Markers_GE"]=[
+        expand(os.path.normpath("{output_clust_markers_annot_dir_ge}" + "/" + CMA_CLUST_FOLDER + "/" + "{sample_name_ge}" + "{complement}" + "_" + str(CMA_KEEP_DIM) + "_" + str(CMA_KEEP_RES) + "_ISOFORM.rda"),zip, output_clust_markers_annot_dir_ge = ISOFORM_OUTPUT_RDA, sample_name_ge = CMA_SAMPLE_NAME_GE, complement = CMA_COMPLEMENT)
+        ]
+    
+    if "Isoform_Markers_GE" in STEPS and "Clust_Markers_Annot_GE not in STEPS":
+        targets["Isoform_Markers_GE"]=[
+        expand("{isoform_output_rda}",isoform_output_rda=COMPLEMENT_ISOFORM_INPUT_RDA)
+        ]
+    
     return targets
