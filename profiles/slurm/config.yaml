@@ -1,14 +1,27 @@
-restart-times: 5
+restart-times: "3"
 jobscript: "slurm-jobscript.sh"
-cluster: "slurm-submit.py"
-cluster-status: "slurm-status.py"
-max-jobs-per-second: 1
-max-status-checks-per-second: 10
-local-cores: 1
-jobs: 30
-keep-going: true
-reason: false
-printshellcmds: true
-jobname: "{name}.{jobid}.snakejob"
-use-conda: true
-conda-prefix: /mnt/beegfs/pipelines/single-cell/lr_1.3_test/single-cell/envs/conda/
+#cluster: "slurm-submit.py"
+#cluster-generic-status-cmd: "slurm-status.py"
+#cluster-generic-cancel-cmd: "scancel"
+max-jobs-per-second: "1"
+max-status-checks-per-second: "1"
+local-cores: "2"
+jobs: "30"
+keep-going: "True"
+#reason: "True"
+printshellcmds: "True"
+jobname: "{name}.{jobid}.slurm.snakejob.sh"
+conda-prefix: "/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/shared_install/"
+#singularity-prefix: /mnt/beegfs/pipelines/unofficial-snakemake-wrappers/singularity/
+# wrapper-prefix: file:///mnt/beegfs/pipelines/snakemake-wrappers/
+#use-singularity: true
+#use-conda: true
+software-deployment-method:
+#  - "apptainer"
+  - "conda"
+shadow-prefix: "tmp"
+rerun-triggers: "mtime"
+use-envmodules: "True"
+# executor: "cluster-generic"
+executor: "slurm-gustave-roussy"
+# log-handler-script: "log_handler.py"
