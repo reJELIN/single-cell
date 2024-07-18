@@ -10,6 +10,7 @@ import numpy
 import pandas as pd
 import re
 import csv
+import snakemake
 
 
 __author__ = "Marine AGLAVE"
@@ -34,6 +35,7 @@ from function_utils import check_delimiter
 STEPS = config['Steps']
 PIPELINE_FOLDER = workflow.snakefile
 PIPELINE_FOLDER = PIPELINE_FOLDER.replace("/Snakefile", "")
+HOME=os.environ['HOME']
 GLOBAL_TMP = config['Tmp'] if 'Tmp' in config else "/tmp"
 if os.path.normpath(GLOBAL_TMP) != "/tmp" :
     if os.path.exists(GLOBAL_TMP) :
@@ -41,6 +43,7 @@ if os.path.normpath(GLOBAL_TMP) != "/tmp" :
     else :
         sys.stderr.write(GLOBAL_TMP + " doesn't exist! Temporary directory is set to /tmp \n")
         GLOBAL_TMP = "/tmp"
+        
         
 if config["Sequencing_type"] == "long-reads":
     DESIGN_FILE_GE = config['design.file']
@@ -238,7 +241,7 @@ if "Droplets_QC_GE" in STEPS:
         if 'Droplets_QC_GE' in config and 'sample.name.ge' in config['Droplets_QC_GE'] and 'input.dir.ge' in config['Droplets_QC_GE']:
             QC_SAMPLE_NAME_GE_RAW = config['Droplets_QC_GE']['sample.name.ge']
             QC_INPUT_DIR_GE = config['Droplets_QC_GE']['input.dir.ge']
-            #check samples names and add "_GE" if needed
+            #check samples names and add "_GE" if needed/mnt/beegfs/scratch/bioinfo_core/B22045_NADR_07/data_output/wf-single-cell_v2.0.3/3700_R9_R10/3700_R9_R10/transcript_processed_feature_bc_matrix/
             QC_SAMPLE_NAME_GE = []
             for i in range(0,len(QC_SAMPLE_NAME_GE_RAW),1):
                 QC_SAMPLE_NAME_GE.append(QC_SAMPLE_NAME_GE_RAW[i] + "_GE") if (QC_SAMPLE_NAME_GE_RAW[i][len(QC_SAMPLE_NAME_GE_RAW[i])-3:] != "_GE") else QC_SAMPLE_NAME_GE.append(QC_SAMPLE_NAME_GE_RAW[i])
@@ -335,7 +338,7 @@ if "Filtering_GE" in STEPS:
         sys.exit("Error: No output.dir.ge find in configfile!\n")
     FILERING_AUTHOR_NAME = config['Filtering_GE']['author.name'].replace(", ", ",").replace(" ", "_") if ('Filtering_GE' in config and 'author.name' in config['Filtering_GE'] and config['Filtering_GE']['author.name'] != None) else "NULL"
     FILERING_AUTHOR_MAIL = config['Filtering_GE']['author.mail'].replace(", ", ",") if ('Filtering_GE' in config and 'author.mail' in config['Filtering_GE'] and config['Filtering_GE']['author.mail'] != None) else "NULL"
-    ### Analysis Parameters
+    ### Analysis Parametersdict
     # QC cell
     FILERING_PCMITO_MIN = config['Filtering_GE']['pcmito.min'] if ('Filtering_GE' in config and 'pcmito.min' in config['Filtering_GE'] and config['Filtering_GE']['pcmito.min'] != None) else "0"
     FILERING_PCMITO_MAX = config['Filtering_GE']['pcmito.max'] if ('Filtering_GE' in config and 'pcmito.max' in config['Filtering_GE'] and config['Filtering_GE']['pcmito.max'] != None) else "0.2"
@@ -459,7 +462,7 @@ if "Clust_Markers_Annot_GE" in STEPS: #alias CMA
     CMA_SR_MINSCORE = config['Clust_Markers_Annot_GE']['sr.minscore'] if ('Clust_Markers_Annot_GE' in config and 'sr.minscore' in config['Clust_Markers_Annot_GE'] and config['Clust_Markers_Annot_GE']['sr.minscore'] != None) else "NULL"
     # Metadata file
     CMA_METADATA_FILE = config['Clust_Markers_Annot_GE']['metadata.file'].replace(", ", ",") if ('Clust_Markers_Annot_GE' in config and 'metadata.file' in config['Clust_Markers_Annot_GE'] and config['Clust_Markers_Annot_GE']['metadata.file'] != None) else "NULL"
-    ### Snakefile parameters
+    ### Snakefile parametersdict
     #check end paths (add "/" if necessary)
     for i in range(0,len(CMA_OUTPUT_DIR_GE),1):
         CMA_OUTPUT_DIR_GE[i] = os.path.normpath(CMA_OUTPUT_DIR_GE[i])
@@ -716,7 +719,7 @@ if "Int_Adding_ADT" in STEPS:
         sys.stderr.write("Note: No input.rda find in Int_Adding_ADT section of configfile; input.rda will be determine from Int_Clust_Markers_Annot_GE step for Int_Adding_ADT step!\n")
         INT_ADD_ADT_INPUT_RDA = [os.path.normpath(os.path.dirname(dic_INT_CMA_INFO[INT_CMA_NAME_INT[x]]['INT_CMA_INPUT_RDA']) + "/" + INT_CMA_CLUST_FOLDER + "/" + INT_CMA_NAME_INT[x] + INT_CMA_COMPLEMENT[x] + "_" + str(INT_CMA_KEEP_DIM) + "_" + str(INT_CMA_KEEP_RES) + ".rda") for x in range(len(INT_CMA_NAME_INT))]
     else:
-        sys.exit("Error: No input.rda in configfile!\n")
+        sys.exit("Error: No input.rda in config: invalid syntaxfile!\n")
     if 'Int_Adding_ADT' in config and 'samples.name.adt' in config['Int_Adding_ADT'] and 'input.dirs.adt' in config['Int_Adding_ADT'] :
         INT_ADD_ADT_INPUT_DIR_ADT = [ x.replace(", ", ",") for x in config['Int_Adding_ADT']['input.dirs.adt']]
         INT_ADD_ADT_SAMPLE_NAME_ADT_RAW = [ x.replace(", ", ",") for x in config['Int_Adding_ADT']['samples.name.adt']]
@@ -1017,28 +1020,55 @@ if "Isoform_Markers_GE"in STEPS:
     
     if ('Isoform_Markers_GE' in config) and ('input.rda' in config['Isoform_Markers_GE']) and ('sample.name.ge' in config['Isoform_Markers_GE']):
         ISOFORM_INPUT_RDA = ISOFORM_INPUT_RDA + config['Isoform_Markers_GE']['input.rda']
-        COMPLEMENT_ISOFORM_INPUT_RDA=[i.split(".rda")[0]+"_ISOFORM.rda" for i  in ISOFORM_INPUT_RDA]
-        ISOFORM_SAMPLE_NAME_GE_RAW = config['Clust_Markers_Annot_GE']['sample.name.ge']
+        COMPLEMENT_ISOFORM_OUTPUT_RDA=[i.split(".rda")[0]+"_ISOFORM.rda" for i  in ISOFORM_INPUT_RDA]
+        ISOFORM_SAMPLE_NAME_GE_RAW = config['Isoform_Markers_GE']['sample.name.ge']
     elif "Clust_Markers_Annot_GE" in STEPS:
         sys.stderr.write("Note: input.rda will be determine from Clust_Markers_Annot_GE step for Isoform_Markers_GE step!\n")
         ISOFORM_INPUT_RDA = ISOFORM_INPUT_RDA + [os.path.normpath(os.path.dirname(dic_CMA_INFO[CMA_SAMPLE_NAME_GE[x]]['CMA_INPUT_RDA']) + "/" + CMA_CLUST_FOLDER + "/" + CMA_SAMPLE_NAME_GE[x] + CMA_COMPLEMENT[x] + "_" + str(CMA_KEEP_DIM) + "_" + str(CMA_KEEP_RES) + ".rda") for x in range(len(CMA_SAMPLE_NAME_GE))]
-        ISOFORM_SAMPLE_NAME_GE_RAW = copy.deepcopy(CMA_SAMPLE_NAME_GE_RAW)
+        COMPLEMENT_ISOFORM_OUTPUT_RDA=[os.path.normpath(os.path.dirname(dic_CMA_INFO[CMA_SAMPLE_NAME_GE[x]]['CMA_INPUT_RDA']) + "/" + CMA_CLUST_FOLDER + "/" + CMA_SAMPLE_NAME_GE[x] + CMA_COMPLEMENT[x] + "_" + str(CMA_KEEP_DIM) + "_" + str(CMA_KEEP_RES) + "_ISOFORM.rda") for x in range(len(CMA_SAMPLE_NAME_GE))]
+        ISOFORM_SAMPLE_NAME_GE_RAW = config['Clust_Markers_Annot_GE']['sample.name.ge']
     else:
         sys.exit("Error: No sample.name.ge or/and input.rda.ge in configfile!\n")
        
     if 'Isoform_Markers_GE' in config and 'output.rda' in config['Isoform_Markers_GE']:
         ISOFORM_OUTPUT_RDA = ISOFORM_OUTPUT_RDA + config['Isoform_Markers_GE']['output.rda']
     elif "Clust_Markers_Annot_GE" in STEPS:
-        ISOFORM_OUTPUT_RDA= ISOFORM_OUTPUT_RDA + [dic_CMA_INFO[CMA_SAMPLE_NAME_GE[x]]['CMA_INPUT_RDA'] + "/" + CMA_CLUST_FOLDER + "/" for x in range(len(CMA_SAMPLE_NAME_GE))]
+        ISOFORM_OUTPUT_RDA= ISOFORM_OUTPUT_RDA + [dic_CMA_INFO[CMA_SAMPLE_NAME_GE[x]]['CMA_INPUT_RDA'].split("pca")[0] + "pca" +"/" + CMA_CLUST_FOLDER + "/" for x in range(len(CMA_SAMPLE_NAME_GE))]
     else:
-        sys.exit("Error.No.output.rda in configfile \n")
+        sys.exit("Error No output.rda in configfile \n")
+
+    COMPLEMENT_ISOFORM_OUTPUT_RDA_LIST_END=[COMPLEMENT_ISOFORM_OUTPUT_RDA[i].split("/")[-1].split(ISOFORM_SAMPLE_NAME_GE_RAW[i])[1] for i in range(0,len(ISOFORM_SAMPLE_NAME_GE_RAW))]
+
+    COMPLEMENT_ISOFORM_OUTPUT_RDA_LIST_START=["/".join(i.split("/")[-2::-1][::-1]) for i in COMPLEMENT_ISOFORM_OUTPUT_RDA]
+
+    COMPLEMENT_ISOFORM_INPUT_RDA_LIST_END=[ISOFORM_INPUT_RDA[i].split("/")[-1].split(ISOFORM_SAMPLE_NAME_GE_RAW[i])[1] for i in range(0,len(ISOFORM_SAMPLE_NAME_GE_RAW))]
+
+    COMPLEMENT_ISOFORM_INPUT_RDA_LIST_START=["/".join(i.split("/")[-2::-1][::-1]) for i in ISOFORM_INPUT_RDA]
+
+    ISFORM_MTX_INTPUT = [i[0].split(i[1])[0] for i in list(zip(ISOFORM_INPUT_RDA,ISOFORM_SAMPLE_NAME_GE_RAW))]
     
-    ISFORM_MTX_INTPUT = [i.split(i[1])[0]+i[1]+"/"+i[1]+"/transcript_processed_feature_bc_matrix/" for i in list(zip(ISOFORM_INPUT_RDA,ISOFORM_SAMPLE_NAME_GE_RAW))]
     
     if 'Isoform_Markers_GE' in config and 'gtf.ge' in config['Isoform_Markers_GE']:
-        GTF_GE = config['Isoform_Markers_GE']['gtf.ge'] 
+        GTF_GE = config['Isoform_Markers_GE']['gtf.ge']
+        #get every index except the last index (we don't need the name of the file)
+        SING_PARAMS_GTF="/".join(GTF_GE.split("/")[:-1])
     else: 
         sys.exit("Error: No gtf.ge in configfile (Isoform_Markers_GE)!")
+        
+    if 'Isoform_Markers_GE' in config and 'species' in config['Isoform_Markers_GE']:
+        if config['Isoform_Markers_GE']['species'] not in ["human","mouse"]:
+            sys.exit("species must be either human or mouse in configfile \n")
+        else:
+            ISOFORM_SPECIES=config['Isoform_Markers_GE']['species']
+    elif 'Alignment_countTable_LR_GE' in config and 'species' in config['Alignment_countTable_LR_GE']:
+        if config['Alignment_countTable_LR_GE']['species'] not in ["human","mouse"]:
+            sys.exit("species must be either human or mouse in configfile \n")
+        else:
+            ISOFORM_SPECIES=config['Alignment_countTable_LR_GE']['species']
+    else:
+        sys.exit("Error no species in configfile \n")
+        
+    SING_PARAMS_OUTPUT=[" -B " + i + ":" + i + " -B " + PIPELINE_FOLDER + ":" + PIPELINE_FOLDER + "/ -B " + SING_PARAMS_GTF + ":" + SING_PARAMS_GTF +"/" for i in ISFORM_MTX_INTPUT]
         
     if len(ISOFORM_INPUT_RDA) == 0 :
         sys.exit("Error: No input.rda in configfile for Isoform_Markers_GE step!\n")
@@ -1135,6 +1165,8 @@ if "Int_Norm_DimRed_Eval_GE" in STEPS :
     INT_SINGULARITY_ENV = PIPELINE_FOLDER + "/envs/singularity/single_cell_integration.simg"
 if "Alignment_annotations_TCR_BCR" in STEPS or "Adding_TCR" in STEPS or "Adding_BCR" in STEPS or "Int_Adding_TCR" in STEPS or "Int_Adding_BCR" in STEPS or "Grp_Adding_TCR" in STEPS or "Grp_Adding_BCR" in STEPS:
     SINGULARITY_ENV_TCR_BCR = PIPELINE_FOLDER + "/envs/singularity/single_cell_TCR_BCR.simg"
+if "Isoform_Markers_GE" in STEPS:
+     SINGULARITY_ENV_LR = PIPELINE_FOLDER +"/envs/singularity/single_cell_lr.simg"
 
 
 ### rule all ###################################################################################################################################
@@ -1212,5 +1244,8 @@ if "Grp_Adding_TCR" in STEPS:
 if "Grp_Adding_BCR" in STEPS:
     include: "rules/Grp_Adding_BCR.smk"
     
-if "Alignment_countTable_LR_GE":
+if "Alignment_countTable_LR_GE" in STEPS:
     include: "rules/Alignment_countTable_LR_GE.smk"
+    
+if "Isoform_Markers_GE" in STEPS:
+    include: "rules/Isoform_Markers_GE.smk"
