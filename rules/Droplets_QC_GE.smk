@@ -47,7 +47,7 @@ def QC_params_input_folder(wildcards):
     return input_folder
 
 """
-This function allows to determine the singularity binding parameters.
+This function allows to determine the singularity 5432706binding parameters.
 """
 def QC_params_sing(wildcards):
     kallisto_folder = dic_SAMPLE_NAME_GE_INFO[wildcards.sample_name_ge]['QC_INPUT_DIR']
@@ -123,7 +123,7 @@ if sequencing_type == "short-reads":
             --str.genes.file {params.SING_QC_ST_FILE} \
             --translation.file {params.SING_QC_TRANSLATION_FILE} \
             --metadata.file {QC_METADATA_FILE} \
-            --metadata.file {params.SING_QC_METADATA_FILE} 
+            --metadata.file {params.SING_QC_METADATA_FILE} \
             --sequencing_type {params.seq_type} && \
             rm -r $TMP_DIR || rm -r $TMP_DIR
         """
@@ -185,7 +185,7 @@ if sequencing_type == "long-reads":
             --str.genes.file {params.SING_QC_ST_FILE} \
             --translation.file {params.SING_QC_TRANSLATION_FILE} \
             --metadata.file {QC_METADATA_FILE} \
-            --metadata.file {params.SING_QC_METADATA_FILE} 
+            --metadata.file {params.SING_QC_METADATA_FILE} \
             --sequencing_type {params.seq_type} && \
             rm -r $TMP_DIR || rm -r $TMP_DIR
         """

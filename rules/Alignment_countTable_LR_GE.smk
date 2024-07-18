@@ -64,10 +64,10 @@ rule alignment_inputs_ge_lr:
         genes_counts_matrix=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/gene_raw_feature_bc_matrix/matrix.mtx.gz",
         transcript_counts_matrix=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/transcript_raw_feature_bc_matrix/matrix.mtx.gz"
     resources:
-        mem_mb = (lambda wildcards, attempt: min(attempt * 150000, 300000)),
-        time_min = (lambda wildcards, attempt: min(attempt * 2880, 10080))
+        mem_mb = (lambda wildcards, attempt: min(attempt * 50000, 256000)),
+        time_min = (lambda wildcards, attempt: min(attempt * 1440, 10080))
     threads:
-        48
+        20
     params:
         output_path=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/",
         workflow_dir=PIPELINE_FOLDER,
@@ -75,7 +75,7 @@ rule alignment_inputs_ge_lr:
         min_cells=min_cells,
         min_genes=min_genes,
         max_mito=max_mito,
-        fastq_path=lambda wcs: FASTQ_PATH_GE[wcs.sample_name_ge],
+        fastq_path=lambda wcs: FASTQ_PATH_GE[wcs.sample_name_ge]
     shell:
         """
         export TMPDIR={GLOBAL_TMP}

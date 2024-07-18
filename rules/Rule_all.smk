@@ -125,17 +125,11 @@ def get_targets(STEPS):
         targets["Alignment_countTable_LR_GE"]=[
         expand(ALIGN_OUTPUT_DIR_GE+"/samplesheet/{sample_name_ge}_samplesheet.csv",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
         expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/gene_raw_feature_bc_matrix/matrix.mtx.gz",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
-        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/transcript_raw_feature_bc_matrix/matrix.mtx.gz",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
+        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/transcript_raw_feature_bc_matrix/matrix.mtx.gz",sample_name_ge=ALIGN_SAMPLE_NAME_GE)
         ]
-        
-    if "Isoform_Markers_GE" in STEPS and "Clust_Markers_Annot_GE" in STEPS:
+    if "Isoform_Markers_GE" in STEPS:
         targets["Isoform_Markers_GE"]=[
-        expand(os.path.normpath("{output_clust_markers_annot_dir_ge}" + "/" + CMA_CLUST_FOLDER + "/" + "{sample_name_ge}" + "{complement}" + "_" + str(CMA_KEEP_DIM) + "_" + str(CMA_KEEP_RES) + "_ISOFORM.rda"),zip, output_clust_markers_annot_dir_ge = ISOFORM_OUTPUT_RDA, sample_name_ge = CMA_SAMPLE_NAME_GE, complement = CMA_COMPLEMENT)
+        expand("{start}/{sample_name_ge}{end}",zip,start=COMPLEMENT_ISOFORM_OUTPUT_RDA_LIST_START,sample_name_ge=ISOFORM_SAMPLE_NAME_GE_RAW,end=COMPLEMENT_ISOFORM_OUTPUT_RDA_LIST_END)
         ]
-    
-    if "Isoform_Markers_GE" in STEPS and "Clust_Markers_Annot_GE not in STEPS":
-        targets["Isoform_Markers_GE"]=[
-        expand("{isoform_output_rda}",isoform_output_rda=COMPLEMENT_ISOFORM_INPUT_RDA)
-        ]
-    
+
     return targets

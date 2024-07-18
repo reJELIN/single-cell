@@ -41,7 +41,7 @@ nextflow run ${path_to_pipeline} \
     -w ${output_dir_path}/workspace \
     -profile singularity \
     --fastq ${fastq_dir_path} \
-    --threads 48 \
+    --threads 20 \
     --single_cell_sample_sheet ${sample_sheet} \
     --ref_genome_dir ${ref_genome_dir} \
     --matrix_min_genes ${min_genes} \

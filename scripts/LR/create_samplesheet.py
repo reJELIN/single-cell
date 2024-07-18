@@ -19,4 +19,4 @@ output_file=args.output_path+"/samplesheet/"+args.sample_id+"_samplesheet.csv"
 
 row = design_file.loc[design_file["sample_id"] == args.sample_id]
 
-row[["sample_id", "kit_name","kit_version","exp_cells"]].to_csv(output_file,sep=",",index=False)
+row[["sample_id", "kit_name","kit_version","expected_cells"]].to_csv(output_file,sep=",",index=False)

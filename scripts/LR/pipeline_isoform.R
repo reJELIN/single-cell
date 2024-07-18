@@ -1,60 +1,64 @@
-library(dplyr)
-library(tidyr)
-library(tibble)
-library(ggplot2)
-library(scuttle)
-library(DEXSeq)
-library(RColorBrewer)
-library(dittoSeq)
-library(Nebulosa)
-library(biomaRt)
-library(rtracklayer)
-library(purrr)
-library(ggtranscript)
-library(dplyr)
-library(magrittr)
-library(Seurat)
-library(SeuratObject)
-library(waffle)
-library(gridExtra)
-library(grid)
-library(cowplot)
-library(gridGraphics)
-library(ggpubr)
-library(RColorBrewer)
-library(reshape2)
-library(optparse)
-library(AnnotationDbi)
-library(presto)
+suppressMessages(library(dplyr))
+suppressMessages(library(tidyr))
+suppressMessages(library(tibble))
+suppressMessages(library(ggplot2))
+suppressMessages(library(scuttle))
+suppressMessages(library(DEXSeq))
+suppressMessages(library(RColorBrewer))
+suppressMessages(library(dittoSeq))
+suppressMessages(library(Nebulosa))
+suppressMessages(library(biomaRt))
+suppressMessages(library(rtracklayer))
+suppressMessages(library(purrr))
+suppressMessages(library(ggtranscript))
+suppressMessages(library(dplyr))
+suppressMessages(library(magrittr))
+suppressMessages(library(Seurat))
+suppressMessages(library(SeuratObject))
+suppressMessages(library(waffle))
+suppressMessages(library(gridExtra))
+suppressMessages(library(grid))
+suppressMessages(library(cowplot))
+suppressMessages(library(gridGraphics))
+suppressMessages(library(ggpubr))
+suppressMessages(library(RColorBrewer))
+suppressMessages(library(reshape2))
+suppressMessages(library(optparse))
+suppressMessages(library(AnnotationDbi))
+suppressMessages(library(presto))
+suppressMessages(library(httr))
 
 option_list <- list(
-    make_option("--input_dir_ge", help="Input path of the alignment"),
-    make_option("--output_dir_ge", help="Output path")
+    make_option("--input_rda_ge", help="Input path of the rda file"),
+    make_option("--output_rda_ge", help="Output path of the rda file"),
+    make_option("--output_dir_ge", help="Output path"),
     make_option("--gtf_file",help="gtf file for the isoform analysis"),
-    make_option("--sample_id",help="name of sample"),
     make_option("--path_isoform_transcript_matrix",help="path to isoform transcript matrix"),
-    make_option("--seurat_obj_rda",help="seurat object"),
+    make_option("--species",help="name of the species")
 )
 
 parser <- OptionParser(usage="Rscript %prog [options]", description = " ", option_list = option_list)
 args <- parse_args(parser, positional_arguments = 0)
 
-input_dir_ge <- args$options$input_dir_ge
+input_rda_ge <- args$options$input_rda_ge
+output_rda_ge <- args$options$output_rda_ge
 output_dir_ge <- args$option$output_dir_ge
 gtf_file <- args$option$gtf_file
-sample_id <- args$option$sample_id
+species_ensembl <- args$option$species
 isoform_transcript_matrix <- args$option$path_isoform_transcript_matrix
-seurat_obj_rda <- args$option$seurat_obj_rda
+
+if(species_ensembl == "human"){ensemble2gene <- read.table(file="/mnt/beegfs/pipelines/single-cell/lr_1.3_test/single-cell/common/database/ensembl_hsapiens.txt",header=T,sep="\t")}
+
+if(species_ensembl == "mouse"){ensemble2gene <- read.table(file="/mnt/beegfs/pipelines/single-cell/lr_1.3_test/single-cell/common/database/ensembl_mmusculus.txt",header=T,sep="\t")}
 
 quite_message <- function(message_txt){
     message(message_txt)
     quit("no", -1)
 }
 
+load(input_rda_ge)
 
-load(seurat_obj_rda)
-
-scmat <- Seurat::Read10X(data.dir = input_dir_ge)
+scmat <- Seurat::Read10X(data.dir = isoform_transcript_matrix)
 
 scmat <- scmat[,rownames(sobj@meta.data)]
 isoform_name <- scmat@Dimnames[[1]]
@@ -108,19 +112,27 @@ group_contrasts <- utils::combn(levels(as.factor(sobj@meta.data$seurat_clusters)
 marker_results_list <- lapply(group_contrasts,function(group_contrast){wilcoxauc(X=sobj,group_by="seurat_clusters",groups_use=group_contrast,seurat_assay = 'Isoform',assay="data")})
 names(marker_results_list) <- sapply(group_contrasts, paste0,collapse = "__")
 
-#get gene_symbol for each ENST ensembl id version
-mart <- useMart("ensembl","hsapiens_gene_ensembl")
+#setconfig(config(sslverifypeer = 0L)) or httr::set_config(httr::config(ssl_verifypeer = FALSE))
 
+#set_config(config(ssl_verifypeer = 0L))
+#get gene_symbol for each ENST ensembl id version
+#mart <- useMart("ensembl","hsapiens_gene_ensembl")
+#'www', 'useast', 'asia'.
+
+#ensembl <- useEnsembl(biomart = "ensembl", 
+#                   dataset = "hsapiens_gene_ensembl", 
+#                   mirror = "useast")
+                   
 marker_results_list_translate <- lapply(names(marker_results_list),function(contrast_name){
 	
 	marker_df <- marker_results_list[[contrast_name]] %>% as.data.frame()
 	marker_df$ensembl_transcript_id_version <- marker_df$feature
 	marker_df$ensembl_transcript_id_version <- as.character(marker_df$ensembl_transcript_id_version)
 	
-	ensemble2gene <- getBM(attributes=c("external_gene_name","ensembl_gene_id","ensembl_transcript_id_version"),
-                       filters = "ensembl_transcript_id_version",
-                       values = marker_df$feature, 
-                       mart = mart)
+	#ensemble2gene <- getBM(attributes=c("external_gene_name","ensembl_gene_id","ensembl_transcript_id_version"),
+    #                   filters = "ensembl_transcript_id_version",
+    #                   values = marker_df$feature, 
+    #                   mart = ensembl)
                        
        ensemble2gene$ensembl_transcript_id_version <- as.character(ensemble2gene$ensembl_transcript_id_version)   
      
@@ -132,43 +144,39 @@ marker_results_list_translate <- lapply(names(marker_results_list),function(cont
 
 #bind each list of markers together
 marker_df <- do.call(rbind, marker_results_list_translate)
-
 #THIS IS NOT ISOFORM SWITCH distribution, we find DEG between each clusters and keep only DEG genes that have more than one transcripts version
 isoswitch_df <- marker_df %>%
-	   dplyr::filter(.data$padj <= 0.05) %>%
-	   dplyr::filter(.data$logFC > 0.1) %>%
-	   dplyr::group_by(.data$ensembl_gene_id, .data$contrast) %>%
-	    dplyr::mutate(n_groups = length(unique(.data$group)),
-		          n_transcripts = length(unique(.data$ensembl_transcript_id_version))) %>%
-	    dplyr::ungroup() %>%
-	    dplyr::filter(.data$n_groups > 1, .data$n_transcripts > 1) %>%
-	    dplyr::select(-"n_groups", -"n_transcripts") %>%
-	    dplyr::arrange(.data$contrast, .data$ensembl_gene_id) %>%
-	    as.data.frame()
+    dplyr::filter(.data$pct_in > 25 | .data$pct_out > 25) %>%
+	dplyr::filter(.data$padj <= 0.05) %>%
+	dplyr::filter(.data$logFC > 0.1) %>%
+	dplyr::group_by(.data$ensembl_gene_id, .data$contrast) %>%
+	dplyr::mutate(n_groups = length(unique(.data$group)),n_transcripts = length(unique(.data$ensembl_transcript_id_version))) %>%
+	dplyr::ungroup() %>%
+	dplyr::filter(.data$n_groups > 1, .data$n_transcripts > 1) %>%
+	dplyr::select(-"n_groups", -"n_transcripts") %>%
+	dplyr::arrange(.data$contrast, .data$ensembl_gene_id) %>%
+	as.data.frame()
+	
 
 
 
-main_path <- output_dir_ge
-path_ftpl <- paste0(main_path,"isoform/FeaturePlots")
-path_report <- paste0(main_path,"isoform/reports")
+path_ftpl <- paste0(output_dir_ge,"isoform/FeaturePlots")
+path_report <- paste0(output_dir_ge,"isoform/reports")
 dir.create(file.path(path_report), recursive = TRUE)
-dir.create(file.path(path_ftpl), recursive = TRUEscripts/pipeline_isoform.R)
+dir.create(file.path(path_ftpl), recursive = TRUE)
 
+write.table(isoswitch_df,file=paste0(output_dir_ge,"/isoform/",sobj@misc$params$sample.name.GE,"_",sobj@misc$params$clustering$ident,"_isoform_findmarkers_all.txt",sep=","))
 
 Idents(sobj) <- sobj@meta.data$seurat_clusters
 
-
-cluster_umap <- DimPlot(sobj,reduction=sobj@misc$params$clustering,dims=c(1,2),group.by='seurat_clusters',pt.size=2,label=F) + labs(y='UMAP 2',x='UMAP 1') + ggtitle('') + theme(axis.text = (element_text(size=60,colour='black')),
-	     axis.title.x = element_text(size=60),
-	     axis.title.y = element_text(size=60),
+cluster_umap <- DimPlot(sobj,reduction=sobj@misc$params$clustering$umap,dims=c(1,2),group.by='seurat_clusters',pt.size=2,label=F) + labs(y='UMAP 2',x='UMAP 1') + ggtitle('') + theme(axis.text = (element_text(size=15,colour='black')),
+	     axis.title.x = element_text(size=15),
+	     axis.title.y = element_text(size=15),
 	     legend.position= "right",
-	     legend.text = element_text(size=48),
-	     legend.title= element_text(size=48))
-
+	     legend.text = element_text(size=12),
+	     legend.title= element_text(size=12))
 
 for(i_gene in unique(isoswitch_df$external_gene_name)){
-
-	print(i_gene)
 
 	tmp_df_isoform <- isoswitch_df[isoswitch_df$external_gene_name == i_gene,]
 	
@@ -202,12 +210,12 @@ for(i_gene in unique(isoswitch_df$external_gene_name)){
 
 	p1 <- ggplot(longdata, aes(fill=name, y=as.numeric(value), x=cluster_labels)) + 
 	    geom_bar(position="stack", stat="identity") + labs(y="Average logCounts") + theme_classic() + labs(y="Average logcounts", x="clusters", fill="Transcript version") +theme_classic() +
-	     theme(axis.text = (element_text(size=60,colour='black')),
-	     axis.title.x = element_text(size=60),
-	     axis.title.y = element_text(size=60),
+	     theme(axis.text = (element_text(size=15,colour='black')),
+	     axis.title.x = element_text(size=15),
+	     axis.title.y = element_text(size=15),
 	     legend.position= "right",
-	     legend.text = element_text(size=48),
-	     legend.title= element_text(size=48))
+	     legend.text = element_text(size=12),
+	     legend.title= element_text(size=12))
 
 
 	#create empty dataframe to append row
@@ -232,31 +240,36 @@ for(i_gene in unique(isoswitch_df$external_gene_name)){
 	p2 <- ggplot(longdata_prop, aes(fill = name, 
 		                  y = as.numeric(value), 
 		                  x = cluster_labels)) + 
-	  geom_bar(position="stack",stat="identity")  + labs(y="Percentage (%)", x="clusters", fill="Transcript version") +theme_classic() + theme(axis.text = (element_text(size=60)),
-	 			axis.title.x = element_text(size=60,colour="black"),
-	 			axis.title.y = element_text(size=60),
+	  geom_bar(position="stack",stat="identity")  + labs(y="Percentage (%)", x="clusters", fill="Transcript version") +theme_classic() + theme(axis.text = (element_text(size=15)),
+	 			axis.title.x = element_text(size=15,colour="black"),
+	 			axis.title.y = element_text(size=15),
 	 			legend.position= "right",
-	 			legend.text = element_text(size=48),
-	 			legend.title= element_text(size=48)) 
+	 			legend.text = element_text(size=12),
+	 			legend.title= element_text(size=12)) 
 		   
 	    
 
 	p3 <- DotPlot(object=sobj,assay="Isoform",
 	  features=unique(tmp_df_isoform$ensembl_transcript_id_version),
 	  cols = c("blue", "red"),
-	  group.by = "seurat_clusters") + labs(y="clusters", x="transcript version") +theme_classic() + theme(axis.text = (element_text(size=60,angle = 50, vjust = 0.5, hjust=1)),
-	 			axis.title.x = element_text(size=60),
-	 			axis.title.y = element_text(size=60),
+	  group.by = "seurat_clusters") + labs(y="clusters", x="transcript version") +theme_classic() + theme(axis.text = (element_text(size=15,angle = 50, vjust = 0.5, hjust=1)),
+	 			axis.title.x = element_text(size=15),
+	 			axis.title.y = element_text(size=15),
 	 			legend.position= "right",
-	 			legend.text = element_text(size=48),
-	 			legend.title= element_text(size=48)) 
+	 			legend.text = element_text(size=12),
+	 			legend.title= element_text(size=12)) 
 
 	
-	p5  <- FeaturePlot(object=sobj, features = unique(tmp_df_isoform$ensembl_transcript_id_version),reduction = "SCT_pca_25_umap",cols = c("grey", "red"))
+	p5  <- FeaturePlot(object=sobj, features = unique(tmp_df_isoform$ensembl_transcript_id_version),reduction = sobj@misc$params$clustering$umap,cols = c("grey", "red"))
 	
-	pdf(paste0(path_ftpl,"/",i_gene,".pdf"),width=8,height=3*nrow(tmp_df_isoform))
+	pdf(paste0(path_ftpl,"/",i_gene,".pdf"),width=3*nrow(tmp_df_isoform),height=3*nrow(tmp_df_isoform))
 	plot(p5)
 	dev.off()
+	
+	
+	if(length(ls(pattern="violin_to_plot_")) > 0){
+	   rm(list=ls(pattern="violin_to_plot_"))
+	}
 	
 	p_violin  <- Seurat::VlnPlot(sobj,assay="Isoform", features = c(unique(tmp_df_isoform$ensembl_transcript_id_version)),group.by="seurat_clusters",combine=FALSE)
 	
@@ -265,25 +278,25 @@ for(i_gene in unique(isoswitch_df$external_gene_name)){
 	
 	for(i in seq(1,length(p_violin))){
 	if(i == length(p_violin)){
-		p_violin[[i]] <- p_violin[[i]] + theme(axis.text = (element_text(size=60)),
-		 			axis.title.x = element_text(size=60),
-		 			axis.title.y = element_text(size=60),
+		p_violin[[i]] <- p_violin[[i]] + theme(axis.text = (element_text(size=15)),
+		 			axis.title.x = element_text(size=15),
+		 			axis.title.y = element_text(size=15),
 		 			legend.position= "right",
-		 			legend.text = element_text(size=48),
-		 			legend.title= element_text(size=48),
-		 			plot.title=element_text(size=30))}else{
-		p_violin[[i]] <- p_violin[[i]] + theme(axis.text = (element_text(size=60)),
+		 			legend.text = element_text(size=12),
+		 			legend.title= element_text(size=12),
+		 			plot.title=element_text(size=10))}else{
+		p_violin[[i]] <- p_violin[[i]] + theme(axis.text = (element_text(size=15)),
 					legend.position= "none",
-		 			axis.title.x = element_text(size=60),
-		 			axis.title.y = element_text(size=60),
-		 			plot.title=element_text(size=30))}
+		 			axis.title.x = element_text(size=15),
+		 			axis.title.y = element_text(size=15),
+		 			plot.title=element_text(size=10))}
 		 			}
 	for(i in seq(1,length(p_violin))){
-	assign(paste0("p_violin_",i),p_violin[[i]])
+	assign(paste0("violin_to_plot_",i),p_violin[[i]])
 	}
 	
-	rm(p_violin_all)
-	p_violin_all <- patchwork::wrap_plots(lapply(ls(pattern="p_violin_"),get)) + patchwork::plot_layout(ncol = 3)
+	
+	p_violin_all <- patchwork::wrap_plots(lapply(ls(pattern="violin_to_plot_"),get)) + patchwork::plot_layout(ncol = 3)
  	
 	
 
@@ -332,21 +345,34 @@ for(i_gene in unique(isoswitch_df$external_gene_name)){
 	 			geom_range(aes(fill = transcript_type)) +
 	 			geom_intron(data = transcript_data_intron,
 	 			arrow.min.intron.length = 200) +
-	 			theme_classic() + theme(axis.text = (element_text(size=60)),
-	 			axis.title.x = element_text(size=60),
-	 			axis.title.y = element_text(size=60),
-	 			axis.text.x = element_text(angle = 50, vjust = 0.5, hjust=1,size=48),
-	 			axis.text.y = element_text(angle = 50, vjust = 0.5, hjust=1,size=48),
+	 			theme_classic() + theme(axis.text = (element_text(size=15)),
+	 			axis.title.x = element_text(size=12),
+	 			axis.title.y = element_text(size=12),
+	 			axis.text.x = element_text(angle = 50, vjust = 0.5, hjust=1,size=12),
+	 			axis.text.y = element_text(angle = 50, vjust = 0.5, hjust=1,size=12),
 	 			legend.position= "top",
 	 			) + ylab("transcript version") + xlab("length") + labs(fill="Transcript type")
 	
 
    	ggarrange_plot <- ggarrange(p1,p2,p3,p_ggtranscript,p_violin_all,cluster_umap,ncol = 3, nrow = 2)
    	
-	pdf(paste0(path_report,"/",i_gene,".pdf"),width=5*as.integer(nrow(tmp_df_isoform)+2),height=5*nrow(tmp_df_isoform)+2)
-	plot(ggarrange_plot)
-	dev.off()
+   	nb_transcript_for_plot=unique(tmp_df_isoform$ensembl_transcript_id_version)
+   	
+   	if(nb_transcript_for_plot <= 3){
+       	pdf(paste0(path_report,"/",i_gene,".pdf"),width=7*3,height=3.5*3)
+    	plot(ggarrange_plot)
+    	dev.off()
+   	}
+   	
+   	if(nb_transcript_for_plot >= 4){
+   	    pdf(paste0(path_report,"/",i_gene,".pdf"),width=7*4,height=10.5)
+    	plot(ggarrange_plot)
+    	dev.off()
+   	}
+   	
+
 }
 
-paste0(output_dir_ge)
-save(file=,sobj,compress="bzip2")
+sobj@assays[["Isoform"]]@scale.data <- matrix(nrow = 0, ncol = 0)
+
+save(file=output_rda_ge,sobj,compress="bzip2")
