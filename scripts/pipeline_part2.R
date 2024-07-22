@@ -262,4 +262,8 @@ if(doublets.filter.method != 'none'){
   ### Saving non-normalized object
   cat("\nSaving object...\n")
   save(sobj, file = paste0(doublet.filtered.dir, sample.name.GE, '_FILTERED_NON-NORMALIZED.rda'), compress = "bzip2")
+  cat("\nSaving barcodes...\n")
+  vector_name  <- strsplit(rownames(sobj@meta.data),split="-1")
+  vector_name <- unlist(vector_name)
+  write.table(vector_name,file= paste0(doublet.filtered.dir, sample.name.GE, '_FILTERED_barcodes.txt'),quote=F,row.names=F,col.names=F)
 }
