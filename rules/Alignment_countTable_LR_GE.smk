@@ -62,10 +62,15 @@ rule alignment_inputs_ge_lr:
         samplesheet=ALIGN_OUTPUT_DIR_GE+"/samplesheet/{sample_name_ge}_samplesheet.csv"
     output:
         genes_counts_matrix=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/gene_raw_feature_bc_matrix/matrix.mtx.gz",
-        transcript_counts_matrix=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/transcript_raw_feature_bc_matrix/matrix.mtx.gz"
+        transcript_counts_matrix=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/transcript_raw_feature_bc_matrix/matrix.mtx.gz",
+        bam=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/tagged.bam"
     resources:
-        mem_mb = (lambda wildcards, attempt: min(attempt * 50000, 256000)),
-        time_min = (lambda wildcards, attempt: min(attempt * 1440, 10080))
+        mem_mb = (lambda wildcards, attempt: min(attempt * 50000, 400000)),
+        time_min = (lambda wildcards, attempt: min(attempt * 2880, 10080))
+    envmodules:
+        "java/12.0.2",
+        "nextflow/21.10.6",
+        "singularity/3.6.3",
     threads:
         20
     params:
@@ -87,5 +92,37 @@ rule alignment_inputs_ge_lr:
         -r {input.ref_genome_dir} \
         -o {params.output_path} \
         -n {params.sample_id} \
-        -f {params.fastq_path}
+        -f {params.fastq_path} \
+        -t $TMPDIR
         """
+    
+#rule epi2me_pipeline:
+#    input:
+#        ref_genome=ref_genome_dir=ref_genome_dir,
+#        samplesheet=ALIGN_OUTPUT_DIR_GE+"/samplesheet/{sample_name_ge}_samplesheet.csv"
+#        pipeline_dir="",
+#        fastq_dir="",
+#    output:
+#        file1="",
+#        file2="",
+#    handover: True
+#    envmodules:
+#        "java/12.0.2",
+#        "nextflow/21.10.6",
+#        "singularity/3.6.3",
+#    resources:
+#        mem_mb="",
+#        runtime="",
+#        tmpdir="./tmp/",
+#    threads: 20
+#    params:
+#        out_dir=lambda wildcards, output: os.path.commonprefix(output),
+#    log:
+#        "logs/..."
+#    benchmark:
+#        "benchmark/..."
+#    shell:
+#        "nexflot run "
+#        "--threads {threads} "
+#        "..."
+#        "> {log} 2>&1 "

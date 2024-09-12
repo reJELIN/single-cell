@@ -3,6 +3,7 @@
 This function make the input of rule all
 ##########################################################################
 """
+    
 def get_targets(STEPS):
     targets = {}
     if "Alignment_countTable_GE" in STEPS:
@@ -125,11 +126,33 @@ def get_targets(STEPS):
         targets["Alignment_countTable_LR_GE"]=[
         expand(ALIGN_OUTPUT_DIR_GE+"/samplesheet/{sample_name_ge}_samplesheet.csv",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
         expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/gene_raw_feature_bc_matrix/matrix.mtx.gz",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
-        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/transcript_raw_feature_bc_matrix/matrix.mtx.gz",sample_name_ge=ALIGN_SAMPLE_NAME_GE)
+        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/transcript_raw_feature_bc_matrix/matrix.mtx.gz",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
+        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/tagged.bam",sample_name_ge=ALIGN_SAMPLE_NAME_GE)
         ]
     if "Isoform_Markers_GE" in STEPS:
         targets["Isoform_Markers_GE"]=[
-        expand("{start}/{sample_name_ge}{end}",zip,start=COMPLEMENT_ISOFORM_OUTPUT_RDA_LIST_START,sample_name_ge=ISOFORM_SAMPLE_NAME_GE_RAW,end=COMPLEMENT_ISOFORM_OUTPUT_RDA_LIST_END)
+        expand("{start}/{sample_name_ge}{end}",zip,start=COMPLEMENT_ISOFORM_OUTPUT_RDA_LIST_START,sample_name_ge=ISOFORM_SAMPLE_NAME_GE,end=COMPLEMENT_ISOFORM_OUTPUT_RDA_LIST_END)
+        ]
+    if "Variants_Markers_GE" in STEPS:
+        targets["Variants_Markers_GE"]=[
+        expand(ALIGN_OUTPUT_DIR_GE+ "/{sample_name_ge}/" + FILTERS_FOLDER + "/DOUBLETSFILTER_all/{sample_name_ge}_FILTERED_barcodes.txt",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
+        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/split_chrom/split_bam_done.txt",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
+        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/split_chrom/tagged_sort_"+chr_list[0]+".bam",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
+        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/barcodes_batch/{sample_name_ge}_barcodes_list_{batch_number}.txt",sample_name_ge=ALIGN_SAMPLE_NAME_GE,batch_number=batch_number_seq),
+        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/tmp_barcodes/DONE_{sample_name_ge}_barcodes_list_{batch_number}.txt",sample_name_ge=ALIGN_SAMPLE_NAME_GE,batch_number=batch_number_seq),
+        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/tmp_merge/DONE_{sample_name_ge}_barcodes_list_{batch_number}.txt",sample_name_ge=ALIGN_SAMPLE_NAME_GE,batch_number=batch_number_seq),
+        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/tmp_mpileup/DONE_{sample_name_ge}_barcodes_list_{batch_number}.txt",sample_name_ge=ALIGN_SAMPLE_NAME_GE,batch_number=batch_number_seq),
+        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/matrix_SNP_{sample_name_ge}.tsv",sample_name_ge=ALIGN_SAMPLE_NAME_GE,batch_number=batch_number_seq)
+        ]
+    if "Variants_Calling_GE" in STEPS:
+        targets["Variants_Calling_GE"]=[
+        expand(ALIGN_OUTPUT_DIR_GE+ "/{sample_name_ge}/" + FILTERS_FOLDER + "/DOUBLETSFILTER_all/{sample_name_ge}_FILTERED_barcodes.txt",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
+        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/filtered_tagged.bam",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
+        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/filtered_sort_tagged.bam",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
+        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/{sample_name_ge}_longshot.vcf",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
+        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/{sample_name_ge}_longshot.vcf.gz",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
+        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/{sample_name_ge}_longshot_filtered.vcf.gz",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
+        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/{sample_name_ge}_longshot_filtered.vcf.gz.tbi",sample_name_ge=ALIGN_SAMPLE_NAME_GE)
         ]
 
     return targets

@@ -18,6 +18,8 @@ while getopts ":s:o:r:g:c:m:f:n:" option; do
             fastq_dir_path=$OPTARG;;
         n)
             sample_name=$OPTARG;;
+        t)
+            tmpdir=$OPTARG;;
 
    esac
 done
@@ -27,7 +29,9 @@ module load java/12.0.2
 module load nextflow/21.10.6
 module load singularity/3.6.3
 
-export TMPDIR=/tmp/
+export TMPDIR=${tmpdir}
+
+echo "TMP DIR: ${TMPDIR}"
 
 #parameters
 pipeline_version="v2.0.3"
@@ -48,4 +52,4 @@ nextflow run ${path_to_pipeline} \
     --matrix_min_cells ${min_cells} \
     --matrix_max_mito ${max_mito} \
     --out_dir ${output_dir_path} \
-    -with-report nextflow_report_${sample_name}.html -with-trace -with-timeline nextflow_timeline_${sample_name}.html -with-dag nextflow_flowchart_${sample_name}.png -resume
+    -resume

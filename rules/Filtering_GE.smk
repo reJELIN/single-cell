@@ -4,9 +4,6 @@ These rules filter droplets according to quality-control and whether to filter d
 ##########################################################################
 """
 
-wildcard_constraints:
-    sample_name_ge=".+_GE"
-
 """
 This function allows to determine the input .rda file.
 """
