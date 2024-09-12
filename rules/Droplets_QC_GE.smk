@@ -9,9 +9,6 @@ try:
 except KeyError:
     sequencing_type="short-reads"
 
-wildcard_constraints:
-    sample_name_ge=".+_GE"
-
 """
 This function allows to determine the input alignment folder/files.
 """
@@ -26,18 +23,16 @@ def QC_droplets_input_ge(wildcards):
         files=[kallisto_folder]
     return files
 
-def QC_droplets_input_ge_lr(wildcards):
-    epi2me_folder = dic_SAMPLE_NAME_GE_INFO[wildcards.sample_name_ge]['QC_INPUT_DIR']
-    if "Alignment_countTable_GE_LR" in STEPS:
-        mtx_file = os.path.normpath(epi2me_folder + "/" + wildcards.sample_name_ge + ".mtx.gz")
-        barcodes_file = os.path.normpath(epi2me_folder + "/" + wildcards.sample_name_ge + ".barcodes.tsv.gz")
-        genes_file = os.path.normpath(epi2me_folder + "/" + wildcards.sample_name_ge + ".features.tsv.gz")
-        files=[mtx_file, barcodes_file, genes_file]
-    
-    else:
-        files=[epi2me_folder]
-    print(epi2me_folder)
-    return files
+#def QC_droplets_input_ge_lr(wildcards):
+#    epi2me_folder = dic_SAMPLE_NAME_GE_INFO[wildcards.sample_name_ge]['QC_INPUT_DIR']
+#    if "Alignment_countTable_GE_LR" in STEPS:
+#        mtx_file = ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/gene_raw_feature_bc_matrix/matrix.mtx.gz
+#        barcodes_file = os.path.normpath(epi2me_folder + "/" + wildcards.sample_name_ge + ".barcodes.tsv.gz")
+#        genes_file = os.path.normpath(epi2me_folder + "/" + wildcards.sample_name_ge + ".features.tsv.gz")
+#        files=[mtx_file, barcodes_file, genes_file]
+#    else:
+#        files=[epi2me_folder]
+#    return files
 
 """
 This function allows to determine the input alignment folder for params section.
@@ -47,7 +42,7 @@ def QC_params_input_folder(wildcards):
     return input_folder
 
 """
-This function allows to determine the singularity 5432706binding parameters.
+This function allows to determine the singularity 5432706 binding parameters.
 """
 def QC_params_sing(wildcards):
     kallisto_folder = dic_SAMPLE_NAME_GE_INFO[wildcards.sample_name_ge]['QC_INPUT_DIR']
@@ -69,7 +64,7 @@ This rule launches R scipt to read count matrix and perform droplets control-qua
 if sequencing_type == "short-reads":
     rule QC_droplets_ge:
         input:
-            QC_droplets_input_ge
+            
         output:
             kneeplot_file = os.path.normpath("{outputqc_droplets_dir_ge}" + "/QC_droplets/" + "{sample_name_ge}_kneeplot.png") if  str(QC_EMPTYDROPS_RETAIN) == "NULL" else os.path.normpath("{outputqc_droplets_dir_ge}" + "/QC_droplets_retain" + str(QC_EMPTYDROPS_RETAIN) + "/{sample_name_ge}_kneeplot.png"),
             saturation_file = os.path.normpath("{outputqc_droplets_dir_ge}" + "/QC_droplets/" + "{sample_name_ge}_saturation_plot.png") if  str(QC_EMPTYDROPS_RETAIN) == "NULL" else os.path.normpath("{outputqc_droplets_dir_ge}" + "/QC_droplets_retain" + str(QC_EMPTYDROPS_RETAIN) + "/{sample_name_ge}_saturation_plot.png"),
@@ -131,7 +126,7 @@ if sequencing_type == "short-reads":
 if sequencing_type == "long-reads":
     rule QC_droplets_ge:
         input:
-            QC_droplets_input_ge_lr
+            mtx=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/gene_raw_feature_bc_matrix/matrix.mtx.gz"
         output:
             kneeplot_file = os.path.normpath("{outputqc_droplets_dir_ge}" + "/QC_droplets/" + "{sample_name_ge}_kneeplot.png") if  str(QC_EMPTYDROPS_RETAIN) == "NULL" else os.path.normpath("{outputqc_droplets_dir_ge}" + "/QC_droplets_retain" + str(QC_EMPTYDROPS_RETAIN) + "/{sample_name_ge}_kneeplot.png"),
             saturation_file = os.path.normpath("{outputqc_droplets_dir_ge}" + "/QC_droplets/" + "{sample_name_ge}_saturation_plot.png") if  str(QC_EMPTYDROPS_RETAIN) == "NULL" else os.path.normpath("{outputqc_droplets_dir_ge}" + "/QC_droplets_retain" + str(QC_EMPTYDROPS_RETAIN) + "/{sample_name_ge}_saturation_plot.png"),
