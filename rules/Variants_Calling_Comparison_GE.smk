@@ -8,9 +8,9 @@ def cluster_ofint(wildcards):
     return design_dict[wildcards.sample_name_ge]["clusters_of_interest"]
     
 if config["species"] == "human":
-    ref_genome="/mnt/beegfs/database/bioinfo/cellranger/2020-A/refdata-gex-GRCh38-2020-A/fasta/genome.fa"
+    ref_genome="/mnt/beegfs02/database/bioinfo/cellranger/2020-A/refdata-gex-GRCh38-2020-A/fasta/genome.fa"
 if config["species"] == "mouse":
-    ref_genome="/mnt/beegfs/database/bioinfo/cellranger/2020-A/refdata-gex-mm10-2020-A/fasta/genome.fa"
+    ref_genome="/mnt/beegfs02/database/bioinfo/cellranger/2020-A/refdata-gex-mm10-2020-A/fasta/genome.fa"
 
 rule extract_barcodes:
     input:
@@ -78,7 +78,7 @@ rule run_longshot:
     threads:
         2
     conda:
-        "/mnt/beegfs/pipelines/single-cell/lr_1.3_test/single-cell/envs/conda/env_longshot.yml"
+        "/mnt/beegfs02/pipelines/single-cell/lr_1.3_test/single-cell/envs/conda/env_longshot.yml"
     shell:
         """
         longshot --bam {input} \
@@ -102,7 +102,7 @@ rule compress_vcf:
     threads:
         3
     conda:
-        "/mnt/beegfs/pipelines/single-cell/lr_1.3_test/single-cell/envs/conda/d58a6ebdc411f7854aad53828a4f5722_.yaml
+        "/mnt/beegfs02/pipelines/single-cell/lr_1.3_test/single-cell/envs/conda/d58a6ebdc411f7854aad53828a4f5722_.yaml
     shell:
         """
         bcftools view --write-index=tbi --with-header -O z -o {output.vcf_out} {input.vcf_in}

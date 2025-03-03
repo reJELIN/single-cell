@@ -21,10 +21,10 @@ except KeyError:
     species="human"
     
 if species == "human":
-    ref_genome_dir="/mnt/beegfs/database/bioinfo/cellranger/2020-A/refdata-gex-GRCh38-2020-A"
+    ref_genome_dir="/mnt/beegfs02/database/bioinfo/cellranger/2020-A/refdata-gex-GRCh38-2020-A"
     
 if species == "mouse":
-    ref_genome_dir="/mnt/beegfs/database/bioinfo/cellranger/2020-A/refdata-gex-mm10-2020-A"
+    ref_genome_dir="/mnt/beegfs02/database/bioinfo/cellranger/2020-A/refdata-gex-mm10-2020-A"
     
 """
 #################################################################################################################

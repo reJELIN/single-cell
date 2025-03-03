@@ -18,7 +18,7 @@ import glob
 
 __author__ = "Marine AGLAVE"
 
-#using: snakemake --profile /mnt/beegfs/pipelines/single-cell/profiles/slurm -s /mnt/beegfs/pipelines/single-cell/Snakefile --configfile /mnt/beegfs/userdata/m_aglave/pipeline/test_new_data/Params.yaml
+#using: snakemake --profile /mnt/beegfs02/pipelines/single-cell/profiles/slurm -s /mnt/beegfs02/pipelines/single-cell/Snakefile --configfile /mnt/beegfs02/userdata/m_aglave/pipeline/test_new_data/Params.yaml
 
 sys.stderr.write("\n############################################################# \n")
 sys.stderr.write("\n\n\t Single-cell RNA-seq pipeline \n\n")
@@ -31,7 +31,7 @@ sys.stderr.write("\n#################### Setting Parameters ####################
 #rootpath = os.path.join(os.getcwd(), '..')
 #sys.path.append(rootpath)
 
-sys.path.append('/mnt/beegfs/pipelines/single-cell/lr_1.3_test/single-cell/common')
+sys.path.append('/mnt/beegfs02/pipelines/single-cell/lr_1.3_test/single-cell/common')
 
 from function_utils import check_delimiter
 
@@ -151,7 +151,7 @@ if "Alignment_annotations_TCR_BCR" in STEPS:
     ALIGN_OUTPUT_DIR_TCR_BCR = os.path.normpath(config['Alignment_annotations_TCR_BCR']['output.dir.tcr_bcr'])
     ALIGN_INPUT_DIR_TCR_BCR = os.path.normpath(ALIGN_OUTPUT_DIR_TCR_BCR + "/fastq/")
     ### Index
-    CRINDEX_TCR_BCR=config['Alignment_annotations_TCR_BCR']['crindex.tcr_bcr'] if ('Alignment_annotations_TCR_BCR' in config and 'crindex.tcr_bcr' in config['Alignment_annotations_TCR_BCR']) else "/mnt/beegfs/database/bioinfo/single-cell/TCR_REFERENCES/refdata-cellranger-vdj-GRCh38-alts-ensembl-3.1.0"
+    CRINDEX_TCR_BCR=config['Alignment_annotations_TCR_BCR']['crindex.tcr_bcr'] if ('Alignment_annotations_TCR_BCR' in config and 'crindex.tcr_bcr' in config['Alignment_annotations_TCR_BCR']) else "/mnt/beegfs02/database/bioinfo/single-cell/TCR_REFERENCES/refdata-cellranger-vdj-GRCh38-alts-ensembl-3.1.0"
     ### File names
     #TCR
     ALIGN_SAMPLE_NAME_TCR = []
@@ -230,7 +230,7 @@ if "Alignment_countTable_GE" in STEPS or "Alignment_annotations_TCR_BCR" in STEP
     elif 'Alignment_annotations_TCR_BCR' in config and 'fastqscreen_index' in config['Alignment_annotations_TCR_BCR']:
         FASTQSCREEN_INDEX = config['Alignment_annotations_TCR_BCR']['fastqscreen_index']
     else :
-        FASTQSCREEN_INDEX = "/mnt/beegfs/database/bioinfo/single-cell/INDEX/FASTQ_SCREEN/0.14.0/fastq_screen.conf"
+        FASTQSCREEN_INDEX = "/mnt/beegfs02/database/bioinfo/single-cell/INDEX/FASTQ_SCREEN/0.14.0/fastq_screen.conf"
 
 if "Alignment_countTable_GE" in STEPS or "Alignment_countTable_ADT" in STEPS or "Alignment_annotations_TCR_BCR" in STEPS:
     # Cutadapt parameters
@@ -1181,9 +1181,9 @@ if "Int_Isoform_Markers" in STEPS:
         GTF_INT = config['Int_Isoform_Markers']
     elif "Int_Isoform_Markers" not in config and 'species' in config:
         if config['species'] == "human":
-            GTF_INT="/mnt/beegfs/database/bioinfo/cellranger/2020-A/refdata-gex-GRCh38-2020-A/genes/genes.gtf"
+            GTF_INT="/mnt/beegfs02/database/bioinfo/cellranger/2020-A/refdata-gex-GRCh38-2020-A/genes/genes.gtf"
         if config['species'] == "mouse":
-            GTF_INT="/mnt/beegfs/database/bioinfo/cellranger/2020-A/refdata-gex-mm10-2020-A/genes/genes.gtf"
+            GTF_INT="/mnt/beegfs02/database/bioinfo/cellranger/2020-A/refdata-gex-mm10-2020-A/genes/genes.gtf"
 
     else:
         sys.exit("no gtf file in config parameters")
@@ -1210,9 +1210,9 @@ if "Grp_Isoform_Markers" in STEPS:
         GTF_GRP = config['Grp_Isoform_Markers']
     elif "Grp_Isoform_Markers" not in config and 'species' in config:
         if config['species'] == "human":
-            GTF_GRP="/mnt/beegfs/database/bioinfo/cellranger/2020-A/refdata-gex-GRCh38-2020-A/genes/genes.gtf"
+            GTF_GRP="/mnt/beegfs02/database/bioinfo/cellranger/2020-A/refdata-gex-GRCh38-2020-A/genes/genes.gtf"
         if config['species'] == "mouse":
-            GTF_GRP="/mnt/beegfs/database/bioinfo/cellranger/2020-A/refdata-gex-mm10-2020-A/genes/genes.gtf"
+            GTF_GRP="/mnt/beegfs02/database/bioinfo/cellranger/2020-A/refdata-gex-mm10-2020-A/genes/genes.gtf"
         
     
     SING_PARAMS_OUTPUT_GRP=" -B " + INT_ISOFORM_OUPUT_DIR_GLOBAL + ":" + INT_ISOFORM_OUPUT_DIR_GLOBAL + " -B " + PIPELINE_FOLDER + ":" + PIPELINE_FOLDER + "/ -B " + GTF_GRP + ":" + GTF_GRP + "/"
