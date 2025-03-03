@@ -5,15 +5,25 @@ object
 """
 ##########################################################################
 
+def input_rda_isoform_marker_ge(wildcards):
+    return ISOFORM_DICT[wildcards.sample_name_ge]["input_rda"]
+
+def ouput_folder_isoform_marker_ge(wildcards):
+    return ISOFORM_DICT[wildcards.sample_name_ge]["output_folder"]
+
+def isoform_mtx_isoform_marker_ge(wildcards):
+    return ISOFORM_DICT[wildcards.sample_name_ge]["isoform_mtx"]   
+
+
 rule isoform_marker_ge:
     input:
-	    input_rda_file = expand("{start}/{sample_name_ge}{end}",zip,start=COMPLEMENT_ISOFORM_INPUT_RDA_LIST_START,sample_name_ge=ISOFORM_SAMPLE_NAME_GE,end=COMPLEMENT_ISOFORM_INPUT_RDA_LIST_END)
+	    input_rda_file = input_rda_isoform_marker_ge
     output:
-	    output_rda_file = expand("{start}/{sample_name_ge}{end}",zip,start=COMPLEMENT_ISOFORM_OUTPUT_RDA_LIST_START,sample_name_ge=ISOFORM_SAMPLE_NAME_GE,end=COMPLEMENT_ISOFORM_OUTPUT_RDA_LIST_END)
+	    output_rda_file = ISFORM_MTX_INTPUT[0]+"{sample_name_ge}/{sample_name_ge}/{sample_name_ge}_"+CMA_CLUST_FOLDER+"_sobj_isoform.rda"
     params:
-	    sing_bind = expand("{sing_params}",sing_params=SING_PARAMS_OUTPUT),
-	    folder_dir_ge = expand("{folder_output}",folder_output=ISOFORM_OUTPUT_RDA),
-	    isoform_mtx = expand("{folder_path}{sample_name_ge}/{sample_name_ge}/transcript_processed_feature_bc_matrix/",zip,folder_path=ISFORM_MTX_INTPUT,sample_name_ge=ISOFORM_SAMPLE_NAME_GE),
+	    sing_bind = SING_PARAMS_OUTPUT,
+	    folder_dir_ge = ouput_folder_isoform_marker_ge,
+	    isoform_mtx = isoform_mtx_isoform_marker_ge,
 	    gtf_ge = GTF_GE,
 	    workflow_dir = PIPELINE_FOLDER,
 	    species = ISOFORM_SPECIES

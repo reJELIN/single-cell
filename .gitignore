@@ -1,0 +1,15 @@
+envs/singularity/single_cell_lr.simg
+envs/singularity/single_cell_lr_hdWGCNA.simg
+envs/singularity/single_cell_oldcerebro.simg
+envs/singularity/single_cell.simg
+envs/singularity/single_cell_integration.simg
+envs/conda/081e517f45541334f00f30ffd365b4c7_
+envs/conda/27a9eabb
+envs/conda/68b99d6933cd0adabe2d6e80081ff83d_
+envs/conda/88cc368a224fea567f5ae5432b20b512_
+envs/conda/d18e976e
+envs/conda/d4d7c010d366426b2b4e9fd9628bd6f9_
+envs/conda/e687c6de5b4a81e4fc8967553837408d_
+envs/conda/f7aeea1eed26054427054dde8d9855c7_
+*/__pycache__/*
+.snakemake

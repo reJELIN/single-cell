@@ -2,7 +2,7 @@ BootStrap: docker
 From: ubuntu:20.04
 
 #build image
-#sudo apptainer build single_cell_lr.simg single_cell_lr.def
+#sudo singularity build single_cell_lr.simg single_cell_lr.def
 #using image
 #sudo singularity shell -B local_folder:/WORKDIR/container_folder single_cell.simg
 
@@ -65,3 +65,4 @@ From: ubuntu:20.04
     R -e 'BiocManager::install("IsoformSwitchAnalyzeR")'
     R -e 'devtools::install_github("dzhang32/ggtranscript")'
     R -e 'devtools::install_github("immunogenomics/presto")'
+    R -e 'devtools::install_github('smorabit/hdWGCNA', ref='dev')'

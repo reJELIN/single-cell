@@ -2,6 +2,7 @@
 ## To Do: test Harmony and LIGER integration
 #### Read parameters ####
 library(optparse)
+library(SeuratObject)
 option_list <- list(
   ### Project
   make_option("--input.list.rda", help="List of .rda file with individual analysis"),
@@ -389,7 +390,7 @@ if (integration.method == 'Harmony'){
   ## Integration
   red.name <- paste(c(assay, dimred.method, integration.method), collapse = '_')
   png(paste0(norm.dim.red.dir, '/harmony_convergence_plot.png'), width = 1000, height = 1000)
-  sobj <- harmony::RunHarmony(sobj, vtr.batch, reduction = paste(c(assay, dimred.method), collapse = '_'), assay.use = assay, plot_convergence = TRUE, reduction.save = red.name) #, do_pca=FALSE ??
+  sobj <- harmony::RunHarmony(sobj, vtr.batch, reduction = paste(c(assay, dimred.method), collapse = '_'), assay.use = assay, plot_convergence = FALSE, reduction.save = red.name)#, do_pca=FALSE ??
   dev.off()
   ##Clean
   sobj@assays[[assay]]@scale.data <- matrix(nrow = 0, ncol = 0)

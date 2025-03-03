@@ -13,6 +13,7 @@ import csv
 import snakemake
 import numpy as np
 import itertools
+import glob
 
 
 __author__ = "Marine AGLAVE"
@@ -86,6 +87,7 @@ if "Alignment_countTable_LR_GE" in STEPS:
     if 'Alignment_countTable_LR_GE' in config and 'species' not in config['Alignment_countTable_LR_GE']: sys.exit("Error: No species in configfile (Alignment_countTable_LR_GE)!")
     
     ALIGN_OUTPUT_DIR_GE = os.path.normpath(config['Alignment_countTable_LR_GE']['output.dir.ge'])
+    ALIGN_SAMPLE_NAME=config['Alignment_countTable_LR_GE']['sample.name.ge']
     ALIGN_SAMPLE_NAME_GE = [i +"_GE" if i[-3::] != "_GE" else i for i in config['Alignment_countTable_LR_GE']['sample.name.ge']]
     
     if check_delimiter(DESIGN_FILE_GE) != ',':
@@ -110,7 +112,7 @@ if "Alignment_countTable_LR_GE" in STEPS:
     #    raise ValueError("Your design file has more sample than expected")
     
     design_file_dict=pd.read_csv(DESIGN_FILE_GE).to_dict('records')
-    FASTQ_PATH_GE={i['sample_id']:i['path_to_fastq'] for i in design_file_dict if i['sample_id'] in ALIGN_SAMPLE_NAME_GE}
+    FASTQ_PATH_GE={i['sample_id']:i['path_to_fastq'] for i in design_file_dict if i['sample_id'] in ALIGN_SAMPLE_NAME}
     
 if "Alignment_countTable_ADT" in STEPS:
     ### Sample/Project
@@ -1023,12 +1025,13 @@ if "Isoform_Markers_GE"in STEPS:
     
     if ('Isoform_Markers_GE' in config) and ('input.rda' in config['Isoform_Markers_GE']) and ('sample.name.ge' in config['Isoform_Markers_GE']):
         ISOFORM_INPUT_RDA = ISOFORM_INPUT_RDA + config['Isoform_Markers_GE']['input.rda']
-        COMPLEMENT_ISOFORM_OUTPUT_RDA=[i.split(".rda")[0]+"_ISOFORM.rda" for i  in ISOFORM_INPUT_RDA]
+        #COMPLEMENT_ISOFORM_OUTPUT_RDA=[i.split(".rda")[0]+"_ISOFORM.rda" for i  in ISOFORM_INPUT_RDA]
+        
         ISOFORM_SAMPLE_NAME_GE= [i+"_GE" if i[-3::] != "_GE" else i for i in config['Isoform_Markers_GE']['sample.name.ge']]
     elif "Clust_Markers_Annot_GE" in STEPS:
         sys.stderr.write("Note: input.rda will be determine from Clust_Markers_Annot_GE step for Isoform_Markers_GE step!\n")
         ISOFORM_INPUT_RDA = ISOFORM_INPUT_RDA + [os.path.normpath(os.path.dirname(dic_CMA_INFO[CMA_SAMPLE_NAME_GE[x]]['CMA_INPUT_RDA']) + "/" + CMA_CLUST_FOLDER + "/" + CMA_SAMPLE_NAME_GE[x] + CMA_COMPLEMENT[x] + "_" + str(CMA_KEEP_DIM) + "_" + str(CMA_KEEP_RES) + ".rda") for x in range(len(CMA_SAMPLE_NAME_GE))]
-        COMPLEMENT_ISOFORM_OUTPUT_RDA=[os.path.normpath(os.path.dirname(dic_CMA_INFO[CMA_SAMPLE_NAME_GE[x]]['CMA_INPUT_RDA']) + "/" + CMA_CLUST_FOLDER + "/" + CMA_SAMPLE_NAME_GE[x] + CMA_COMPLEMENT[x] + "_" + str(CMA_KEEP_DIM) + "_" + str(CMA_KEEP_RES) + "_ISOFORM.rda") for x in range(len(CMA_SAMPLE_NAME_GE))]
+        #COMPLEMENT_ISOFORM_OUTPUT_RDA=[os.path.normpath(os.path.dirname(dic_CMA_INFO[CMA_SAMPLE_NAME_GE[x]]['CMA_INPUT_RDA']) + "/" + CMA_CLUST_FOLDER + "/" + CMA_SAMPLE_NAME_GE[x] + CMA_COMPLEMENT[x] + "_" + str(CMA_KEEP_DIM) + "_" + str(CMA_KEEP_RES) + "_ISOFORM.rda") for x in range(len(CMA_SAMPLE_NAME_GE))]
         ISOFORM_SAMPLE_NAME_GE = [i+"_GE" if i[-3::] != "_GE" else i for i in config['Clust_Markers_Annot_GE']['sample.name.ge']]
     else:
         sys.exit("Error: No sample.name.ge or/and input.rda.ge in configfile!\n")
@@ -1040,16 +1043,24 @@ if "Isoform_Markers_GE"in STEPS:
     else:
         sys.exit("Error No output.rda in configfile \n")
     
-    COMPLEMENT_ISOFORM_OUTPUT_RDA_LIST_END=[COMPLEMENT_ISOFORM_OUTPUT_RDA[i].split("/")[-1].split(ISOFORM_SAMPLE_NAME_GE[i])[1] for i in range(0,len(ISOFORM_SAMPLE_NAME_GE))]
+    #COMPLEMENT_ISOFORM_OUTPUT_RDA_LIST_END=[COMPLEMENT_ISOFORM_OUTPUT_RDA[i].split("/")[-1].split(ISOFORM_SAMPLE_NAME_GE[i])[1] for i in range(0,len(ISOFORM_SAMPLE_NAME_GE))]
 
-    COMPLEMENT_ISOFORM_OUTPUT_RDA_LIST_START=["/".join(i.split("/")[-2::-1][::-1]) for i in COMPLEMENT_ISOFORM_OUTPUT_RDA]
+    #COMPLEMENT_ISOFORM_OUTPUT_RDA_LIST_START=["/".join(i.split("/")[-2::-1][::-1]) for i in COMPLEMENT_ISOFORM_OUTPUT_RDA]
 
-    COMPLEMENT_ISOFORM_INPUT_RDA_LIST_END=[ISOFORM_INPUT_RDA[i].split("/")[-1].split(ISOFORM_SAMPLE_NAME_GE[i])[1] for i in range(0,len(ISOFORM_SAMPLE_NAME_GE))]
+    #COMPLEMENT_ISOFORM_INPUT_RDA_LIST_END=[ISOFORM_INPUT_RDA[i].split("/")[-1].split(ISOFORM_SAMPLE_NAME_GE[i])[1] for i in range(0,len(ISOFORM_SAMPLE_NAME_GE))]
 
-    COMPLEMENT_ISOFORM_INPUT_RDA_LIST_START=["/".join(i.split("/")[-2::-1][::-1]) for i in ISOFORM_INPUT_RDA]
+    #COMPLEMENT_ISOFORM_INPUT_RDA_LIST_START=["/".join(i.split("/")[-2::-1][::-1]) for i in ISOFORM_INPUT_RDA]
 
     ISFORM_MTX_INTPUT = [i[0].split(i[1])[0] for i in list(zip(ISOFORM_INPUT_RDA,ISOFORM_SAMPLE_NAME_GE))]
     
+    
+    
+    ISOFORM_DICT={}
+    for i in range(0,len(ISOFORM_SAMPLE_NAME_GE)):
+        ISOFORM_DICT[ISOFORM_SAMPLE_NAME_GE[i]]={'sample_name_ge':ISOFORM_SAMPLE_NAME_GE[i],
+        'input_rda':ISOFORM_INPUT_RDA[i],
+        'isoform_mtx':ISFORM_MTX_INTPUT[i]+ISOFORM_SAMPLE_NAME_GE[i]+"/"+ISOFORM_SAMPLE_NAME_GE[i]+"/transcript_processed_feature_bc_matrix/",
+        'output_folder':ISOFORM_OUTPUT_RDA[i]}
     
     if 'Isoform_Markers_GE' in config and 'gtf.ge' in config['Isoform_Markers_GE']:
         GTF_GE = config['Isoform_Markers_GE']['gtf.ge']
@@ -1071,7 +1082,7 @@ if "Isoform_Markers_GE"in STEPS:
     else:
         sys.exit("Error no species in configfile \n")
         
-    SING_PARAMS_OUTPUT=[" -B " + i + ":" + i + " -B " + PIPELINE_FOLDER + ":" + PIPELINE_FOLDER + "/ -B " + SING_PARAMS_GTF + ":" + SING_PARAMS_GTF +"/" for i in ISFORM_MTX_INTPUT]
+    SING_PARAMS_OUTPUT=" -B " + ISFORM_MTX_INTPUT[0] + ":" + ISFORM_MTX_INTPUT[0] + " -B " + PIPELINE_FOLDER + ":" + PIPELINE_FOLDER + "/ -B " + SING_PARAMS_GTF + ":" + SING_PARAMS_GTF +"/"
         
     if len(ISOFORM_INPUT_RDA) == 0 :
         sys.exit("Error: No input.rda in configfile for Isoform_Markers_GE step!\n")
@@ -1079,15 +1090,29 @@ if "Isoform_Markers_GE"in STEPS:
         sys.exit("Error: No output.rda in configfile for Isoform_Markers_GE step!\n")
 
 if "Variants_Calling_GE" in STEPS:
-    if "Alignment_countTable_LR_GE" and "Filtering_GE" in config:
+    if "output.dir.ge" in config["Variants_Calling_GE"]:
+        ALIGN_OUTPUT_DIR_GE=os.path.normpath(config['Variants_Calling_GE']['output.dir.ge'])
+    if "sample" in config["Variants_Calling_GE"]:
+        ALIGN_SAMPLE_NAME_GE=[i+"_GE" if i[-3::] != "_GE" else i for i in config['Variants_Calling_GE']['sample.name.ge']]
+    if "species" in config["Variants_Calling_GE"]:
+        species_longshot=config['Variants_Calling_GE']['species']
+    elif "Variants_Calling_GE" not in config and "Alignment_countTable_LR_GE" in config:
        ALIGN_OUTPUT_DIR_GE=os.path.normpath(config['Alignment_countTable_LR_GE']['output.dir.ge'])
        ALIGN_SAMPLE_NAME_GE=[i+"_GE" if i[-3::] != "_GE" else i for i in config['Alignment_countTable_LR_GE']['sample.name.ge']]
        species_longshot=config['Alignment_countTable_LR_GE']['species']
-    elif "Filtering_GE" not in config:
-        ALIGN_OUTPUT_DIR_GE=config['Variants_Markers_GE']['input.dir.ge']
-        ALIGN_SAMPLE_NAME_GE=[i+"_GE" if i[-3::] != "_GE" else i for i in config['Variants_Markers_GE']['sample.name.ge']]
     else:
         sys.exit("no input.dir.ge/sample.name.ge in configfile \n")
+    if "Filtering_GE" not in STEPS and "Filtering_GE" in config:
+        batch_number_seq=[str(i) for i in range(0,100)]
+        FILERING_PCMITO_MIN = config['Filtering_GE']['pcmito.min'] if ('Filtering_GE' in config and 'pcmito.min' in config['Filtering_GE'] and config['Filtering_GE']['pcmito.min'] != None) else "0"
+        FILERING_PCMITO_MAX = config['Filtering_GE']['pcmito.max'] if ('Filtering_GE' in config and 'pcmito.max' in config['Filtering_GE'] and config['Filtering_GE']['pcmito.max'] != None) else "0.2"
+        FILERING_PCRIBO_MIN = config['Filtering_GE']['pcribo.min'] if ('Filtering_GE' in config and 'pcribo.min' in config['Filtering_GE'] and config['Filtering_GE']['pcribo.min'] != None) else "0"
+        FILERING_PC_RIBO_MAX = config['Filtering_GE']['pcribo.max'] if ('Filtering_GE' in config and 'pcribo.max' in config['Filtering_GE'] and config['Filtering_GE']['pcribo.max'] != None) else "1"
+        FILERING_MIN_FEATURES = config['Filtering_GE']['min.features'] if ('Filtering_GE' in config and 'min.features' in config['Filtering_GE'] and config['Filtering_GE']['min.features'] != None) else "200"
+        FILERING_MIN_COUNTS = config['Filtering_GE']['min.counts'] if ('Filtering_GE' in config and 'min.counts' in config['Filtering_GE'] and config['Filtering_GE']['min.counts'] != None) else "1000"
+        FILERING_MIN_CELLS = config['Filtering_GE']['min.cells'] if ('Filtering_GE' in config and 'min.cells' in config['Filtering_GE'] and config['Filtering_GE']['min.cells'] != None) else "5"
+        FILERING_DOUBLET_FILTER_METHOD= config['Filtering_GE']['doublets.filter.method'] if ('Filtering_GE' in config and 'doublets.filter.method' in config['Filtering_GE'] and config['Filtering_GE']['doublets.filter.method'] != None) else "NULL"
+        FILTERS_FOLDER = "F" + str(FILERING_MIN_FEATURES) + "_C" + str(FILERING_MIN_COUNTS) + "_M" + str(FILERING_PCMITO_MIN) + "-" + str(FILERING_PCMITO_MAX) + "_R" + str(FILERING_PCRIBO_MIN) + "-" + str(FILERING_PC_RIBO_MAX) + "_G" + str(FILERING_MIN_CELLS)
        
 if "Variants_Markers_GE" in STEPS:
     #chr_list=["GL000009.2", "GL000194.1", "GL000195.1", "GL000205.2", "GL000213.1", "GL000218.1", "GL000219.1", "KI270711.1", "KI270713.1", "KI270721.1", "KI270726.1", "KI270727.1", "KI270728.1", "KI270731.1", "KI270734.1", "chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", "chr9", "chr10", "chr11", "chr12", "chr13", "chr14", "chr15", "chr16", "chr17", "chr18", "chr19", "chr20", "chr21", "chr22", "chrM", "chrY", "chrX"]
@@ -1107,9 +1132,18 @@ if "Variants_Markers_GE" in STEPS:
         sys.exit("no input.dir.ge/sample.name.ge in configfile \n")
     
     if "Filtering_GE" in STEPS:
-        
-        #dict_FILTERING_BARCODES={i:dic_FILTER_INFO[i]['FILTER_OUTPUT_DIR']+"/"+FILTERS_FOLDER+"/DOUBLETSFILTER_all/" for i in ALIGN_SAMPLE_NAME_GE}
         batch_number_seq=[str(i) for i in range(0,100)]
+    if "Filtering_GE" not in STEPS and "Filtering_GE" in config:
+        batch_number_seq=[str(i) for i in range(0,100)]
+        FILERING_PCMITO_MIN = config['Filtering_GE']['pcmito.min'] if ('Filtering_GE' in config and 'pcmito.min' in config['Filtering_GE'] and config['Filtering_GE']['pcmito.min'] != None) else "0"
+        FILERING_PCMITO_MAX = config['Filtering_GE']['pcmito.max'] if ('Filtering_GE' in config and 'pcmito.max' in config['Filtering_GE'] and config['Filtering_GE']['pcmito.max'] != None) else "0.2"
+        FILERING_PCRIBO_MIN = config['Filtering_GE']['pcribo.min'] if ('Filtering_GE' in config and 'pcribo.min' in config['Filtering_GE'] and config['Filtering_GE']['pcribo.min'] != None) else "0"
+        FILERING_PC_RIBO_MAX = config['Filtering_GE']['pcribo.max'] if ('Filtering_GE' in config and 'pcribo.max' in config['Filtering_GE'] and config['Filtering_GE']['pcribo.max'] != None) else "1"
+        FILERING_MIN_FEATURES = config['Filtering_GE']['min.features'] if ('Filtering_GE' in config and 'min.features' in config['Filtering_GE'] and config['Filtering_GE']['min.features'] != None) else "200"
+        FILERING_MIN_COUNTS = config['Filtering_GE']['min.counts'] if ('Filtering_GE' in config and 'min.counts' in config['Filtering_GE'] and config['Filtering_GE']['min.counts'] != None) else "1000"
+        FILERING_MIN_CELLS = config['Filtering_GE']['min.cells'] if ('Filtering_GE' in config and 'min.cells' in config['Filtering_GE'] and config['Filtering_GE']['min.cells'] != None) else "5"
+        FILERING_DOUBLET_FILTER_METHOD= config['Filtering_GE']['doublets.filter.method'] if ('Filtering_GE' in config and 'doublets.filter.method' in config['Filtering_GE'] and config['Filtering_GE']['doublets.filter.method'] != None) else "NULL"
+        FILTERS_FOLDER = "F" + str(FILERING_MIN_FEATURES) + "_C" + str(FILERING_MIN_COUNTS) + "_M" + str(FILERING_PCMITO_MIN) + "-" + str(FILERING_PCMITO_MAX) + "_R" + str(FILERING_PCRIBO_MIN) + "-" + str(FILERING_PC_RIBO_MAX) + "_G" + str(FILERING_MIN_CELLS)
         
     if 'Variants_Markers_GE' in config and 'species' in config['Variants_Markers_GE']:
         if config['Variants_Markers_GE']['species'] not in ["human","mouse"]:
@@ -1126,7 +1160,64 @@ if "Variants_Markers_GE" in STEPS:
         BED_FILE=config['Variants_Markers_GE']['bed.file']
     else:
         sys.exit("bed file must be either present in configfile or it can't run the mpileup step \n")
+        
+if "Int_Isoform_Markers" in STEPS:
+    if "Int_Isoform_Markers" in config and 'input.rda' in config['Int_Isoform_Markers']:
+        INT_ISOFORM_INPUT_RDA=config['Int_Isoform_Markers']['input.rda']
+    if "Int_Isoform_Markers" in config and 'output.rda' in config['Int_Isoform_Markers']:
+        INT_ISOFORM_OUTPUT_RDA=config['Int_Isoform_Markers']['output.rda']
+    if "Int_Isoform_Markers" in config and 'name.int' in config['Int_Isoform_Markers']:
+        INT_ISOFORM_SAMPLE=config['Int_Isoform_Markers']['name.int']
+    if "Int_Isoform_Markers" in config and 'ouput.dir' in config['Int_Isoform_Markers']:
+        INT_INSOFORM_SAMPLE=config['Int_Isoform_Markers']['output.dir']
+    if "Int_Clust_Markers_Annot_GE" in STEPS:
+        INT_ISOFORM_SAMPLE=config['Int_Clust_Markers_Annot_GE']['name.int']
+        INT_ISOFORM_INPUT_RDA={i:glob.glob(dic_INT_CMA_INFO[i]['INT_CMA_OUTPUT_DIR']+"/"+INT_CMA_CLUST_FOLDER+"/*.rda")[0] for i in INT_ISOFORM_SAMPLE}
+        INT_ISOFORM_OUTPUT={i:dic_INT_CMA_INFO[i]['INT_CMA_OUTPUT_DIR']+"/"+INT_CMA_CLUST_FOLDER+"/isoform/"+glob.glob(dic_INT_CMA_INFO[i]['INT_CMA_OUTPUT_DIR']+"/"+INT_CMA_CLUST_FOLDER+"/*.rda")[0].split("/")[-1].split(".rda")[0]+"_isoform.rda" for i in INT_ISOFORM_SAMPLE}
+        INT_ISOFORM_OUPUT_DIR_GLOBAL=[dic_INT_CMA_INFO[i]['INT_CMA_OUTPUT_DIR'].split("GROUPED_ANALYSIS")[0] for i in INT_ISOFORM_SAMPLE][0]
+        #INT_ISOFORM_OUPUT_DIR_GLOBAL=INT_ISOFORM_OUPUT_DIR_GLOBAL+"GROUPED_ANALYSIS/INTEGRATED/"
+        
+    if "Int_Isoform_Markers" in config and "gtf.int" in config['Int_Isoform_Markers']:
+        GTF_INT = config['Int_Isoform_Markers']
+    elif "Int_Isoform_Markers" not in config and 'species' in config:
+        if config['species'] == "human":
+            GTF_INT="/mnt/beegfs/database/bioinfo/cellranger/2020-A/refdata-gex-GRCh38-2020-A/genes/genes.gtf"
+        if config['species'] == "mouse":
+            GTF_INT="/mnt/beegfs/database/bioinfo/cellranger/2020-A/refdata-gex-mm10-2020-A/genes/genes.gtf"
 
+    else:
+        sys.exit("no gtf file in config parameters")
+    
+    SING_PARAMS_OUTPUT_INT=" -B " + INT_ISOFORM_OUPUT_DIR_GLOBAL + ":" + INT_ISOFORM_OUPUT_DIR_GLOBAL + " -B " + PIPELINE_FOLDER + ":" + PIPELINE_FOLDER + "/ -B " + GTF_INT + ":" + GTF_INT + "/"
+    
+if "Grp_Isoform_Markers" in STEPS:
+    if "Grp_Isoform_Markers" in config and 'input.rda' in config['Grp_Isoform_Markers']:
+        GRP_ISOFORM_INPUT_RDA=config['Grp_Isoform_Markers']['input.rda']
+    if "Grp_Isoform_Markers" in config and 'output.rda' in config['Grp_Isoform_Markers']:
+        GRP_ISOFORM_OUTPUT_RDA=config['Grp_Isoform_Markers']['output.rda']
+    if "Grp_Isoform_Markers" in config and 'name.int' in config['Grp_Isoform_Markers']:
+        GRP_ISOFORM_SAMPLE=config['Grp_Isoform_Markers']['name.int']
+    if "Grp_Isoform_Markers" in config and 'ouput.dir' in config['Grp_Isoform_Markers']:
+        GRP_INSOFORM_SAMPLE=config['Grp_Isoform_Markers']['output.dir']
+    if "Grp_Clust_Markers_Annot_GE" in STEPS:
+        GRP_ISOFORM_SAMPLE=config['Grp_Clust_Markers_Annot_GE']['name.grp']
+        GRP_ISOFORM_INPUT_RDA={i:glob.glob(dic_GRP_CMA_INFO[i]['GRP_CMA_OUTPUT_DIR']+"/"+GRP_CMA_CLUST_FOLDER+"/*.rda")[0] for i in GRP_ISOFORM_SAMPLE}
+        GRP_ISOFORM_OUTPUT={i:dic_GRP_CMA_INFO[i]['GRP_CMA_OUTPUT_DIR']+"/"+GRP_CMA_CLUST_FOLDER+"/isoform/"+glob.glob(dic_GRP_CMA_INFO[i]['GRP_CMA_OUTPUT_DIR']+"/"+GRP_CMA_CLUST_FOLDER+"/*.rda")[0].split("/")[-1].split(".rda")[0]+"_isoform.rda" for i in GRP_ISOFORM_SAMPLE}
+        GRP_ISOFORM_OUPUT_DIR_GLOBAL=[dic_GRP_CMA_INFO[i]['GRP_CMA_OUTPUT_DIR'].split("GROUPED_ANALYSIS")[0] for i in GRP_ISOFORM_SAMPLE][0]
+
+    
+    if "Grp_Isoform_Markers" in config and "gtf.grp" in config['Grp_Isoform_Markers']:
+        GTF_GRP = config['Grp_Isoform_Markers']
+    elif "Grp_Isoform_Markers" not in config and 'species' in config:
+        if config['species'] == "human":
+            GTF_GRP="/mnt/beegfs/database/bioinfo/cellranger/2020-A/refdata-gex-GRCh38-2020-A/genes/genes.gtf"
+        if config['species'] == "mouse":
+            GTF_GRP="/mnt/beegfs/database/bioinfo/cellranger/2020-A/refdata-gex-mm10-2020-A/genes/genes.gtf"
+        
+    
+    SING_PARAMS_OUTPUT_GRP=" -B " + INT_ISOFORM_OUPUT_DIR_GLOBAL + ":" + INT_ISOFORM_OUPUT_DIR_GLOBAL + " -B " + PIPELINE_FOLDER + ":" + PIPELINE_FOLDER + "/ -B " + GTF_GRP + ":" + GTF_GRP + "/"
+
+    
 if "Cerebro" in STEPS:
     ### Sample/Project
     CEREBRO_INPUT_RDA = []
@@ -1208,6 +1299,11 @@ if "Cerebro" in STEPS:
         SINGULARITY_ENV_CEREBRO = PIPELINE_FOLDER + "/envs/singularity/single_cell.simg"
     else:
         sys.exit("Error: Unknown version of cerebro in configfile!\n")
+    
+    
+#if "Variants_Calling_Comparison_GE" in STEPS:
+
+
 
 #singularity
 if "Droplets_QC_GE" in STEPS or "Filtering_GE" in STEPS or "Norm_DimRed_Eval_GE" in STEPS or "Clust_Markers_Annot_GE" in STEPS or "Adding_ADT" in STEPS or "Int_Clust_Markers_Annot_GE" in STEPS or "Grp_Norm_DimRed_Eval_GE" in STEPS or "Grp_Clust_Markers_Annot_GE" in STEPS:
@@ -1216,7 +1312,7 @@ if "Int_Norm_DimRed_Eval_GE" in STEPS :
     INT_SINGULARITY_ENV = PIPELINE_FOLDER + "/envs/singularity/single_cell_integration.simg"
 if "Alignment_annotations_TCR_BCR" in STEPS or "Adding_TCR" in STEPS or "Adding_BCR" in STEPS or "Int_Adding_TCR" in STEPS or "Int_Adding_BCR" in STEPS or "Grp_Adding_TCR" in STEPS or "Grp_Adding_BCR" in STEPS:
     SINGULARITY_ENV_TCR_BCR = PIPELINE_FOLDER + "/envs/singularity/single_cell_TCR_BCR.simg"
-if "Isoform_Markers_GE" in STEPS:
+if "Isoform_Markers_GE" or "Int_isoform_Markers" in STEPS:
      SINGULARITY_ENV_LR = PIPELINE_FOLDER +"/envs/singularity/single_cell_lr.simg"
 
 
@@ -1309,3 +1405,9 @@ if "Variants_Calling_GE" in STEPS:
     if "Variants_Markers_GE" not in STEPS:
         include: "rules/Extract_barcodes_GE.smk"
     include: "rules/Variants_Calling_GE.smk"
+
+if "Int_Isoform_Markers" in STEPS:
+    include: "rules/Int_Isoform_Markers.smk"
+
+if "Grp_Isoform_Markers" in STEPS:
+    include: "rules/Grp_Isoform_Markers.smk"

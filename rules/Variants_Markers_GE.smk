@@ -1,16 +1,8 @@
-#TODO
-#run longshot
-#get barcodes list
-#split bam by barcodes
-#call mpileup by bam
-#create matrix
-#update seurat object
-
 wildcard_constraints:
     sample_name_ge=".+_GE",
     batch_number_seq=""
 
-
+#bcftools -q 0 -Q 0 -x -C 0
 #ruleorder: split_bams_by_barcodes > extract_barcodes_from_rda > create_batch_list > split_bams_by_barcodes
 
 if VARIANTS_SPECIES == "human":
@@ -27,28 +19,26 @@ rule split_bam_by_chromosome:
     input:
         main_bam=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/tagged.bam"
     output:
-        chr1=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/split_chrom/tagged_sort_"+chr_list[0]+".bam",
-        flag_done=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/split_chrom/split_bam_done.txt"
+        chr1=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/split_chrom/tagged_sort_"+chr_list[0]+".bam"
     params:
         dir_split_chrom=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/split_chrom",
         chrom_list=chr_list
     threads:
         1
-    #envmodules:
-    #    "samtools/0.1.19"
+
     resources:
-        mem_mb = (lambda wildcards, attempt: min(attempt * 1024, 2048)),
+        mem_mb = (lambda wildcards, attempt: min(attempt * 512, 10240)),
         time_min = lambda wildcards, attempt: min(attempt * 360, 1440)
+    conda:
+        "/mnt/beegfs/pipelines/single-cell/lr_1.3_test/single-cell/envs/conda/5009276213d3fd3f1bcae2865c827914_.yaml"
     shell:
         """
-        module load samtools/1.11
         mkdir -pv {params.dir_split_chrom}
         for chr in {params.chrom_list}; do
-            samtools view -bo {params.dir_split_chrom}/tagged_$chr.bam {input.main_bam} $chr
+            samtools view -b -o {params.dir_split_chrom}/tagged_$chr.bam {input.main_bam} $chr
             samtools sort {params.dir_split_chrom}/tagged_$chr.bam -o {params.dir_split_chrom}/tagged_sort_$chr.bam
             samtools index -b {params.dir_split_chrom}/tagged_sort_$chr.bam
         done;
-        touch {output.flag_done}
         """
 
 rule create_batch_list:
@@ -78,7 +68,7 @@ rule create_batch_list:
 rule split_bams_by_barcodes:
     input:
         batch=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/barcodes_batch/{sample_name_ge}_barcodes_list_{batch_number}.txt",
-        flag_done_step_split_bam_chromosome=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/split_chrom/split_bam_done.txt"
+        chr=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/split_chrom/tagged_sort_"+chr_list[0]+".bam"
     output:
         barcodes_batch_done=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/tmp_barcodes/DONE_{sample_name_ge}_barcodes_list_{batch_number}.txt"
     params:
@@ -89,19 +79,17 @@ rule split_bams_by_barcodes:
     threads:
         3
     resources:
-        mem_mb = (lambda wildcards, attempt: min(attempt * 128, 2048)),
-        runtime = lambda wildcards, attempt: min(attempt * 240, 360)
+        mem_mb = (lambda wildcards, attempt: min(attempt * 1024, 2048)),
+        runtime = lambda wildcards, attempt: min(attempt * 180, 360)
     conda:
         "/mnt/beegfs/pipelines/single-cell/lr_1.3_test/single-cell/envs/conda/5009276213d3fd3f1bcae2865c827914_.yaml"
     shell:
         """
-        
-        if [ {input.flag_done_step_split_bam_chromosome} ]; then
+        if [ {input.chr} ]; then
             echo "Split bam by chromosome has been made...continue!"
         fi
         
         mkdir -p {params.output_dir}
-        
     
         for i in `cat {input.batch}`;
         do 
@@ -110,7 +98,7 @@ rule split_bams_by_barcodes:
         	for j in {params.chrom_list};
         	do
         		j_bam="{params.split_chrom_dir}tagged_sort_$j.bam"
-        		samtools view -@ 3 -b -o {params.output_dir}/$i/$i.$j.bam -h -d "CB:$i" $j_bam
+        		samtools view -h -@ 3 --bam -o {params.output_dir}/$i/$i.$j.bam -d "CB:$i" $j_bam
         	done
         done
         
@@ -130,9 +118,7 @@ rule merge_split_bam:
         1
     resources:
         mem_mb = lambda wildcards, attempt: min(attempt *1024, 2048),
-        runtime = lambda wildcards, attempt: min(attempt * 420, 1440)
-    #envmodules:
-    #    "samtools/1.11"
+        runtime = lambda wildcards, attempt: min(attempt * 360, 1440)
     conda:
         "/mnt/beegfs/pipelines/single-cell/lr_1.3_test/single-cell/envs/conda/5009276213d3fd3f1bcae2865c827914_.yaml"
     shell:
@@ -140,8 +126,9 @@ rule merge_split_bam:
         for i in `cat {input.batch}`;
         do
             echo $i
-            samtools merge {params.input_dir}$i/$i.merge.bam {params.input_dir}$i/$i.*.bam
-            samtools index -b {params.input_dir}$i/$i.merge.bam
+            samtools cat {params.input_dir}$i/$i.*.bam -o {params.input_dir}$i/$i.merge.bam
+            samtools sort {params.input_dir}$i/$i.merge.bam -o {params.input_dir}$i/$i.merge_sort.bam
+            samtools index -b {params.input_dir}$i/$i.merge_sort.bam
             
         done
         mkdir -p {params.done_dir}
@@ -164,25 +151,30 @@ rule mpileup_by_barcodes:
     resources:
         mem_mb = lambda wildcards, attempt: min(attempt * 512, 2048),
         runtime = lambda wildcards, attempt: min(attempt * 30, 60)
-    #envmodules:
-    #    "bcftools/1.9"
+    conda:
+        "/mnt/beegfs/pipelines/single-cell/lr_1.3_test/single-cell/envs/conda/bam_readcount.yaml"
     shell:
         """
-        module load bcftools/1.9
         mkdir -p {params.output_dir}
         for i in `cat {input.batch}`;
         do
             echo $i
-            bcftools mpileup {params.input_dir}$i/$i.merge.bam \
-            -R {params.bed_file} \
-            -f {params.ref_genome} -Ov \
-            -o {params.output_dir}$i.vcf \
-            -q 0 -Q 0 -x -C 0 -a INFO/AD,FORMAT/AD,FORMAT/DP4
+            bam-readcount \
+            -l {params.bed_file} \
+            -f {params.ref_genome} \
+            {params.input_dir}$i/$i.merge_sort.bam > {params.output_dir}$i.tsv
         done
         mkdir -p {params.barcodes_batch_done_dir}
         cp {input.batch} {output.barcodes_batch_done}
         """
 
+#            bcftools mpileup {params.input_dir}$i/$i.merge_sort.bam \
+#            -R {params.bed_file} \
+#            -f {params.ref_genome} \
+#            -Ov -o {params.output_dir}$i.vcf \
+#            --indels-cns -B -Q1 --max-BQ 60 --delta-BQ 99 -F0.2 \
+#            -o15 -e1 -h110 --del-bias 0.4 --indel-bias 0.7 -M40000 \
+#            --poly-mqual --seqq-offset 130 --indel-size 80 -a INFO/AD,FORMAT/AD,FORMAT/DP4,FORMAT/DV -A
 rule create_snp_matrix:
     input:
         expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/tmp_mpileup/DONE_{sample_name_ge}_barcodes_list_{batch_number}.txt",batch_number=batch_number_seq,sample_name_ge=ALIGN_SAMPLE_NAME_GE)

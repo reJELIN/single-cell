@@ -4,9 +4,6 @@ This rule make the normalization, dimensions reduction and evaluation in single-
 ##########################################################################
 """
 
-wildcard_constraints:
-    sample_name_ge=".+_GE"
-
 """
 This function allows to determine the input .rda file.
 """

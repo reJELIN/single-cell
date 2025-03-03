@@ -1,0 +1,40 @@
+Steps: ["Alignment_countTable_LR_GE","Droplets_QC_GE","Filtering_GE","Norm_DimRed_Eval_GE","Clust_Markers_Annot_GE","Isoform_Markers_GE","Cerebro","Variants_Markers_GE","Variants_Calling_Comparison_GE"]
+Tmp: "/mnt/beegfs/scratch/r_jelin/single_cell_long_reads/tmp/"
+
+Sequencing_type: "long-reads"
+design.file: "/mnt/beegfs/scratch/bioinfo_core/B24078_ERSO_01/script/01_design_file.csv"
+Alignment_countTable_LR_GE:
+ sample.name.ge: ["4383_tumoral"]
+ output.dir.ge: "/mnt/beegfs/scratch/bioinfo_core/B24078_ERSO_01/data_output"
+ species: "human"
+Droplets_QC_GE:
+ author.name: "remy jelin"
+ author.mail: "Remy.JELIN@gustaveroussy.fr, bigr@gustaveroussy.fr"
+ sample.name.ge: ["4383_tumoral"]
+ translation: FALSE
+Filtering_GE:
+ sample.name.ge: ["4383_tumoral"]
+ min.features: 200
+ min.counts: 1000
+Norm_DimRed_Eval_GE:
+ sample.name.ge: ["4383_tumoral"]
+ norm.method: "LogNormalize"
+ dimred.method: "pca"
+ features.n: 3000
+ dims.step: 2
+Clust_Markers_Annot_GE:
+ sample.name.ge: ["4383_tumoral"]
+ keep.dims: 21
+ keep.res: 0.8
+Isoform_Markers_GE:
+ gtf.ge: "/mnt/beegfs/database/bioinfo/cellranger/2020-A/refdata-gex-GRCh38-2020-A/genes/genes.gtf"
+ species: "human"
+Cerebro:
+ version: "v1.2"
+Variants_Markers_GE:
+ chr_of_interest: ["chr12","chrX","chr1","chr16","chr19","chr3"]
+ species: "human"
+ bed.file: "/mnt/beegfs/scratch/bioinfo_core/B24078_ERSO_01/script/01_variant.bed"
+Variants_Calling_Comparison_GE:
+ design_file: "/mnt/beegfs/pipelines/single-cell/lr_1.3_test/single-cell/test/design_variant_comparison.tsv"
+ output_dir: "/mnt/beegfs/scratch/bioinfo_core/B24078_ERSO_01/data_output/"

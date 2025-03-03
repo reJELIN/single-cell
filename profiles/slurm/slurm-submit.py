@@ -90,6 +90,7 @@ if "resources" in job_properties:
             arg_dict["mem"] = resources["mem_mb"]
         elif "mem" in resources:
             arg_dict["mem"] = resources["mem"]
+
         else:
             arg_dict["mem"] = 1024
     if arg_dict["partition"] is None:
@@ -102,18 +103,13 @@ if "resources" in job_properties:
         elif 10080 <= arg_dict["time"] < 86400:
             arg_dict["partition"] = "verylongq"
         else:
-            raise ValueError(
-                "Too much time requested: {}".format(str(arg_dict["time"]))
-            )
-    if resources.get("gres", None) is not None:
-        if "T4" in resources["gres"].upper():
-            arg_dict["gres"] = resources["gres"]
-            arg_dict["ntasks"] = 1
-            arg_dict["nodes"] = 1
-            arg_dict["partition"] = resources.get("partition", "visuq")
-
-    if resources.get("chdir", None) is not None:
-        arg_dict["chdir"] = resources["chrdir"]
+            raise ValueError("Too much time requested: {}".format(str(arg_dict["time"])))
+        if arg_dict["mem"] > 200000:
+            arg_dict["partition"] = "bigmemq"
+            
+    #if arg_dict["partition"] is None:        
+    #    if arg_dict["mem"] > 200000:
+    #        arg_dict["partition"] = "bigmemq"
 
 
 # Threads
@@ -123,17 +119,17 @@ if "threads" in job_properties:
 opt_keys = ["array", "account", "begin", "cpus_per_task",
             "dependency", "workdir", "error", "job_name", "mail_type",
             "mail_user", "ntasks", "nodes", "output", "partition",
-            "quiet", "time", "wrap", "constraint", "mem", "gres", "chdir"]
+            "quiet", "time", "wrap", "constraint", "mem"]
 
-arg_dict["output"] = "logs/slurm/slurm-%x-%j-%N.out"
+arg_dict["output"] = "./slurm-%j-%x-%N.out"
 if arg_dict["output"] is not None:
     os.makedirs(os.path.dirname(arg_dict["output"]), exist_ok=True)
-arg_dict["error"] = "logs/slurm/slurm-%x-%j-%N.err"
+arg_dict["error"] = "./slurm-%j-%x-%N.out"
 if arg_dict["error"] is not None:
     os.makedirs(os.path.dirname(arg_dict["error"]), exist_ok=True)
 
 arg_dict["mail_type"] = "END,FAIL"
-arg_dict["mail_user"] = "thibault.dayris@gustaveroussy.fr"
+arg_dict["mail_user"] = "{{cookiecutter.mail_user}}"
 
 opts = ""
 for k, v in arg_dict.items():
@@ -145,7 +141,7 @@ for k, v in arg_dict.items():
 if arg_dict["wrap"] is not None:
     cmd = "sbatch {opts}".format(opts=opts)
 else:
-    cmd = "sbatch {opts} {extras}".format(opts=opts, extras=extras)
+    cmd = "sbatch {opts} --exclude=n04,n06 {extras}".format(opts=opts, extras=extras)
 
 try:
     res = subprocess.run(cmd, check=True, shell=True, stdout=subprocess.PIPE)

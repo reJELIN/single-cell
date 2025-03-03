@@ -1,5 +1,6 @@
 #### Read parameters ####
 library(optparse)
+library(SeuratObject)
 option_list <- list(
   ### Project
   make_option("--input.rda.ge", help="Input seurat object (in .rda format) to convert in cerebro object."),

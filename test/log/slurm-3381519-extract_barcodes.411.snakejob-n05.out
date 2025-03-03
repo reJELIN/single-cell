@@ -1,0 +1,63 @@
+
+############################################################# 
+
+
+	 Single-cell RNA-seq pipeline 
+
+
+############################################################# 
+
+
+#################### Setting Parameters ####################
+
+Temporary directory is set to: /mnt/beegfs/scratch/r_jelin/single_cell_long_reads/tmp/
+Note: No sample.name.ge or input.dir.ge find in Droplets_QC_GE section of configfile; sample.name.ge and input.dir.ge will be determine from Alignment_countTable_LR_GE step for Droplets_QC_GE step!
+Note: No input.rda.ge find in Filtering_GE section of configfile; input.rda.ge will be determine from Droplets_QC_GE step for Filtering_GE step!
+Note: No output.dir.ge find in Filtering_GE section of configfile; output.dir.ge will be determine from Droplets_QC_GE step for Filtering_GE step!
+Note: No input.rda.ge find in Norm_DimRed_Eval_GE section of configfile; input.rda.ge will be determine from Filtering_GE step for Norm_DimRed_Eval_GE step!
+Note: No output.dir.ge find in Norm_DimRed_Eval_GE section of configfile; output.dir.ge will be determine from Filtering_GE step for Norm_DimRed_Eval_GE step!
+Note: No input.rda.ge and sample.name.ge find in Clust_Markers_Annot_GE section of configfile; input.rda.ge and sample.name.ge will be determine from Norm_DimRed_Eval_GE step for Clust_Markers_Annot_GE step!
+Note: No output.dir.ge find in Clust_Markers_Annot_GE section of configfile; output.dir.ge will be determine from Norm_DimRed_Eval_GE step for Clust_Markers_Annot_GE step!
+Note: input.rda will be determine from Clust_Markers_Annot_GE step for Isoform_Markers_GE step!
+Note: input.rda will be determine from Clust_Markers_Annot_GE step for Cerebro step!
+
+########################### Run ############################
+
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 2
+Rules claiming more threads will be scaled down.
+Provided resources: mem_mb=5120, mem_mib=4883, disk_mb=1000, disk_mib=954, time_min=20
+Select jobs to execute...
+
+[Fri Feb  7 10:56:45 2025]
+rule extract_barcodes:
+    input: /mnt/beegfs/scratch/bioinfo_core/B24078_ERSO_01/data_output/4383_tumoral_CD45_pos_GE/4383_tumoral_CD45_pos_GE/4383_tumoral_CD45_pos_GE_dims25_res0.2_sobj_isoform.rda
+    output: /mnt/beegfs/scratch/bioinfo_core/B24078_ERSO_01/data_output/4383_tumoral_CD45_pos_GE/4383_tumoral_CD45_pos_GE/SNV_COMPARE/barcodes_ctrl.txt, /mnt/beegfs/scratch/bioinfo_core/B24078_ERSO_01/data_output/4383_tumoral_CD45_pos_GE/4383_tumoral_CD45_pos_GE/SNV_COMPARE/barcodes_ofint.txt
+    jobid: 0
+    reason: Forced execution
+    wildcards: sample_name_ge=4383_tumoral_CD45_pos_GE
+    threads: 2
+    resources: mem_mb=5120, mem_mib=4883, disk_mb=1000, disk_mib=954, tmpdir=/mnt/beegfs/scratch/r_jelin/.tmp, time_min=20
+
+
+        module load singularity
+            
+        singularity exec --no-home -B /mnt/beegfs/scratch/bioinfo_core/B24078_ERSO_01/data_output/:/mnt/beegfs/scratch/bioinfo_core/B24078_ERSO_01/data_output/ -B /mnt/beegfs/pipelines/single-cell/lr_1.3_test/single-cell_old:/mnt/beegfs/pipelines/single-cell/lr_1.3_test/single-cell_old /mnt/beegfs/pipelines/single-cell/lr_1.3_test/single-cell_old/envs/singularity/single_cell.simg Rscript         /mnt/beegfs/pipelines/single-cell/lr_1.3_test/single-cell_old/scripts/LR/get_barcodes_variants_compare.R         --input_rda_ge /mnt/beegfs/scratch/bioinfo_core/B24078_ERSO_01/data_output/4383_tumoral_CD45_pos_GE/4383_tumoral_CD45_pos_GE/4383_tumoral_CD45_pos_GE_dims25_res0.2_sobj_isoform.rda         --output_cluster_ctrl /mnt/beegfs/scratch/bioinfo_core/B24078_ERSO_01/data_output/4383_tumoral_CD45_pos_GE/4383_tumoral_CD45_pos_GE/SNV_COMPARE/barcodes_ctrl.txt         --output_cluster_ofint /mnt/beegfs/scratch/bioinfo_core/B24078_ERSO_01/data_output/4383_tumoral_CD45_pos_GE/4383_tumoral_CD45_pos_GE/SNV_COMPARE/barcodes_ofint.txt         --cluster_ctrl 3         --cluster_ofint 1
+        
+FATAL:   While checking container encryption: could not open image /mnt/beegfs/pipelines/single-cell/lr_1.3_test/single-cell_old/envs/singularity/single_cell.simg: failed to retrieve path for /mnt/beegfs/pipelines/single-cell/lr_1.3_test/single-cell_old/envs/singularity/single_cell.simg: lstat /mnt/beegfs/pipelines/single-cell/lr_1.3_test/single-cell_old: no such file or directory
+[Fri Feb  7 10:56:49 2025]
+Error in rule extract_barcodes:
+    jobid: 0
+    input: /mnt/beegfs/scratch/bioinfo_core/B24078_ERSO_01/data_output/4383_tumoral_CD45_pos_GE/4383_tumoral_CD45_pos_GE/4383_tumoral_CD45_pos_GE_dims25_res0.2_sobj_isoform.rda
+    output: /mnt/beegfs/scratch/bioinfo_core/B24078_ERSO_01/data_output/4383_tumoral_CD45_pos_GE/4383_tumoral_CD45_pos_GE/SNV_COMPARE/barcodes_ctrl.txt, /mnt/beegfs/scratch/bioinfo_core/B24078_ERSO_01/data_output/4383_tumoral_CD45_pos_GE/4383_tumoral_CD45_pos_GE/SNV_COMPARE/barcodes_ofint.txt
+    shell:
+        
+        module load singularity
+            
+        singularity exec --no-home -B /mnt/beegfs/scratch/bioinfo_core/B24078_ERSO_01/data_output/:/mnt/beegfs/scratch/bioinfo_core/B24078_ERSO_01/data_output/ -B /mnt/beegfs/pipelines/single-cell/lr_1.3_test/single-cell_old:/mnt/beegfs/pipelines/single-cell/lr_1.3_test/single-cell_old /mnt/beegfs/pipelines/single-cell/lr_1.3_test/single-cell_old/envs/singularity/single_cell.simg Rscript         /mnt/beegfs/pipelines/single-cell/lr_1.3_test/single-cell_old/scripts/LR/get_barcodes_variants_compare.R         --input_rda_ge /mnt/beegfs/scratch/bioinfo_core/B24078_ERSO_01/data_output/4383_tumoral_CD45_pos_GE/4383_tumoral_CD45_pos_GE/4383_tumoral_CD45_pos_GE_dims25_res0.2_sobj_isoform.rda         --output_cluster_ctrl /mnt/beegfs/scratch/bioinfo_core/B24078_ERSO_01/data_output/4383_tumoral_CD45_pos_GE/4383_tumoral_CD45_pos_GE/SNV_COMPARE/barcodes_ctrl.txt         --output_cluster_ofint /mnt/beegfs/scratch/bioinfo_core/B24078_ERSO_01/data_output/4383_tumoral_CD45_pos_GE/4383_tumoral_CD45_pos_GE/SNV_COMPARE/barcodes_ofint.txt         --cluster_ctrl 3         --cluster_ofint 1
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message

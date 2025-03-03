@@ -1,8 +1,6 @@
-import vcf
 import pandas as pd
 import glob
 import re
-import numpy as np
 import argparse
 
 parser = argparse.ArgumentParser(description='create SNP matrix')
@@ -13,29 +11,50 @@ parser.add_argument('--prefix',help='prefix name',required=True,action='store')
 
 args = parser.parse_args()
 
-input_dir=args.input_directory+'/*.vcf'
-barcodes_list=[re.split("/|\.",i)[-2] for i in glob.glob(pathname=input_dir)]
+input_dir=args.input_directory+'*.tsv'
+print("input_dir :"+input_dir)
+barcodes_list=[i.split("/")[-1].split(".tsv")[0] for  i in glob.glob(pathname=input_dir)]
 
 tmp_col_list=[]
-for barcodes in barcodes_list:
-    vcf_reader = vcf.Reader(open(args.input_directory+'/'+barcodes+'.vcf', 'r'))
-    vcf_list=[{'CHROM':record.CHROM,'POS':record.POS,'REF':record.REF,'ALT':record.ALT,'samples':record.samples} for record in vcf_reader]
-    if len(vcf_list) == 0:
-        tmp_col=[{'variant_ID':"no_value",barcodes:0}]
-    else:
-        tmp_col=[{'variant_ID':i['CHROM']+":"+str(i['POS'])+":"+i['REF']+":"+str(i['ALT'][0]),barcodes:i['samples'][0]['DP4'][2]} for i in vcf_list]
-    tmp_col_list.append(tmp_col)
-    
-tmp_df_dict_list=[]
-for barcodes_dict in tmp_col_list:
-    tmp_df=pd.DataFrame(np.array([i[list(barcodes_dict[0].keys())[1]] for i in barcodes_dict]),index=[i['variant_ID'] for i in barcodes_dict],columns=[list(barcodes_dict[0].keys())[1]]).T
-    tmp_df_dict_list.append(tmp_df)
-    
-final_df=pd.concat(tmp_df_dict_list, axis=0, ignore_index=False)
+print("Get Variant Info\n")
+for barcode in barcodes_list:
+    with open(args.input_directory+barcode+'.tsv', 'r') as tmp_tsv:
+        #get read lines and get number of line
+        lines = tmp_tsv.readlines()
+        line_count = len(lines)
+        
+        #if line count superior to zero iterate through lines
+        if line_count > 0:
+            for line in lines:
+                #split line by tab separator
+                line_split=line.split("\t")
+                #start iterate to 5 and get each count by nucleotides
+                for i in range(5,len(line_split)):
+                    line_tmp=line_split[i].split(":")
+                    tmp_col={"variant_ID":line_split[0]+":"+line_split[1]+":"+line_split[2]+":"+line_tmp[0],barcode:line_tmp[1]}
+                    tmp_col_list.append(tmp_col)
+        elif line_count == 0:
+            tmp_col={"variant_ID":"no_value",barcode:0}
+            tmp_col_list.append(tmp_col)
+    tmp_tsv.close()
 
-final_df.fillna(0, inplace=True)
+print("Creating matrix\n")
+tmp_dict_list=[]
+for barcode in barcodes_list:
+    tmp_barcodes_dict={}
+    for i in tmp_col_list:
+        #get barcodes in tmp_col_list
+        barcodes_tmp=list(i.keys())[1]
+        #compare barcodes to barcodes_tmp if it is the same add value to tmp_barcodes_dict and append it
+        if barcodes_tmp == barcode:
+           tmp_barcodes_dict[i[list(i.keys())[0]]]=i[list(i.keys())[1]]
+    tmp_dict_list.append(tmp_barcodes_dict)
+
+final_df = pd.DataFrame(tmp_dict_list,index=barcodes_list)
+
+#final_df.fillna(0, inplace=True)
 
 final_df=final_df.drop("no_value", axis='columns')
-
+print("Saving")
 output_path_file=args.output_directory+"/matrix_SNP_"+args.prefix+".tsv"
-final_df.to_csv(output_path_file,sep="\t",header=True,index=True)
+final_df.to_csv(output_path_file, sep='\t')

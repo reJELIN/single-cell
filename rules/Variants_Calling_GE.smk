@@ -72,12 +72,11 @@ rule compress_index_vcf:
     threads:
         3
     conda:
-        "/mnt/beegfs/pipelines/single-cell/lr_1.3_test/single-cell/envs/conda/d58a6ebdc411f7854aad53828a4f5722_.yaml"
+        "/mnt/beegfs/pipelines/unofficial-snakemake-wrappers/shared_install/d58a6ebdc411f7854aad53828a4f5722_.yaml"
     shell:
         """
         bcftools view --write-index=tbi --with-header -O z -o {output.vcf_longshot_output_gz} {input.vcf_longshot_input}
         """
-
 
 rule filering_vcf:
     input:
@@ -92,7 +91,7 @@ rule filering_vcf:
     shell:
         """
         module load vcftools/0.1.16 
-        vcftools --gzvcf {input.vcf_longshot_input_gz} --remove-indels --minQ 30 --min-meanDP 10 --max-meanDP 50 --minDP 10 --maxDP 50 --recode --stdout | bgzip -c > {output.vcf_longshot_filtered_output}
+        vcftools --gzvcf {input.vcf_longshot_input_gz} --minQ 30 --minDP 10 --recode --stdout | bgzip -c > {output.vcf_longshot_filtered_output}#--remove-indels
         """
 
 rule index_filtered_vcf:

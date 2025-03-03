@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import argparse
+import numpy as np
 #from pathlib import Path
 
 parser = argparse.ArgumentParser(description='Create samplesheet for nextflow epi2me: wf-single-cell')
@@ -18,5 +19,7 @@ os.makedirs(args.output_path+"/samplesheet",exist_ok=True)
 output_file=args.output_path+"/samplesheet/"+args.sample_id+"_samplesheet.csv"
 
 row = design_file.loc[design_file["sample_id"] == args.sample_id]
+
+row['sample_id'] = args.sample_id+"_GE"
 
 row[["sample_id", "kit_name","kit_version","expected_cells"]].to_csv(output_file,sep=",",index=False)

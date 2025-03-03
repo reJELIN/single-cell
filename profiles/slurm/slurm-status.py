@@ -21,11 +21,10 @@ for i in range(STATUS_ATTEMPTS):
         logger.error(e)
     except IndexError as e:
         pass
-
     # Try getting job with scontrol instead in case sacct is misconfigured
     try:
         sctrl_res = sp.check_output(shlex.split("scontrol -o show job {}".format(jobid)))
-        m = re.search("JobState=(\w+)", sctrl_res.decode())
+        m = re.search("JobState=(\\w+)", sctrl_res.decode())
         res = {jobid: m.group(1)}
         break
     except sp.CalledProcessError as e:

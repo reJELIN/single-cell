@@ -1,0 +1,52 @@
+name: fusions
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+  - r
+  - missionbio
+  - plotly
+dependencies:
+  - _libgcc_mutex=0.1=conda_forge
+  - _openmp_mutex=4.5=2_gnu
+  - bzip2=1.0.8=h4bc722e_7
+  - c-ares=1.34.4=hb9d3cd8_0
+  - ca-certificates=2024.12.31=h06a4308_0
+  - curl=7.88.1=h37d81fd_2
+  - htslib=1.9=h244ad75_9
+  - k8=1.2=h6618dc6_1
+  - kernel-headers_linux-64=3.10.0=he073ed8_18
+  - keyutils=1.6.1=h166bdaf_0
+  - krb5=1.20.1=hf9c8cef_0
+  - ld_impl_linux-64=2.43=h712a8e2_2
+  - libcurl=7.88.1=h91b91d3_2
+  - libdeflate=1.23=h4ddbbb0_0
+  - libedit=3.1.20191231=h46ee950_2
+  - libev=4.33=hd590300_2
+  - libffi=3.2.1=he1b5a44_1007
+  - libgcc=14.2.0=h77fa898_1
+  - libgcc-ng=14.2.0=h69a702a_1
+  - libgomp=14.2.0=h77fa898_1
+  - libnghttp2=1.52.0=ha637b67_1
+  - libssh2=1.10.0=haa6b8db_3
+  - libstdcxx=14.2.0=hc0a3c3a_1
+  - libstdcxx-ng=14.2.0=h4852527_1
+  - libzlib=1.2.13=h4ab18f5_6
+  - minimap2=2.24=h7132678_1
+  - ncurses=6.1=hf484d3e_1002
+  - openssl=1.1.1w=hd590300_0
+  - pip=24.3.1=pyh8b19718_0
+  - pysam=0.17.0=py38h104f7d5_1
+  - python=3.8.6=h852b56e_0_cpython
+  - python_abi=3.8=5_cp38
+  - readline=8.0=h46ee950_1
+  - samtools=1.9=h10a08f8_12
+  - setuptools=75.3.0=pyhd8ed1ab_0
+  - sqlite=3.40.1=h5082296_0
+  - sysroot_linux-64=2.17=h0157908_18
+  - tk=8.6.14=h39e8969_0
+  - tzdata=2024b=hc8b5060_0
+  - wheel=0.45.1=pyhd8ed1ab_0
+  - xz=5.2.10=h5eee18b_1
+  - zlib=1.2.13=h4ab18f5_6
+prefix: /mnt/beegfs/userdata/r_jelin/conda_install/miniforge3/envs/fusions

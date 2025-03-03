@@ -1,0 +1,3 @@
+"sample","input_rda","clusters_control","clusters_of_interest"
+"4383_tumoral_GE","/mnt/beegfs/scratch/bioinfo_core/B24078_ERSO_01/data_output/4383_tumoral_GE/4383_tumoral_GE/4383_tumoral_GE_dims21_res0.2_sobj_isoform.rda","2,0","1,9"
+"4383_tumoral_CD45_pos_GE","/mnt/beegfs/scratch/bioinfo_core/B24078_ERSO_01/data_output/4383_tumoral_CD45_pos_GE/4383_tumoral_CD45_pos_GE/4383_tumoral_CD45_pos_GE_dims25_res0.2_sobj_isoform.rda","3","1"

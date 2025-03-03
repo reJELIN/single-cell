@@ -1,0 +1,17 @@
+restart-times: 2
+jobscript: "slurm-jobscript.sh"
+max-jobs-per-second: 10
+max-status-checks-per-second: 1
+local-cores: 20
+jobs: 30
+keep-going: true
+printshellcmds: true
+jobname: "{name}.{jobid}.slurm.snakejob.sh"
+conda-prefix: "/mnt/beegfs/pipelines/single-cell/lr_1.3_test/single-cell/envs/conda/"
+software-deployment-method:
+ - "conda"
+executor: "slurm-gustave-roussy"
+rerun-triggers: "mtime"
+benchmark-extended: true
+use-envmodules: "True"
+shadow-prefix: "tmp"

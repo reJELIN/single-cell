@@ -15,6 +15,11 @@ try:
 except KeyError:
     species="human"
     
+try:
+    species=config["species"]
+except KeyError:
+    species="human"
+    
 if species == "human":
     ref_genome_dir="/mnt/beegfs/database/bioinfo/cellranger/2020-A/refdata-gex-GRCh38-2020-A"
     
@@ -55,18 +60,17 @@ rule create_sample_sheet:
 These rule launch the epi2melab wf single-cell workflowdata
 #################################################################################################################
 """
-
 rule alignment_inputs_ge_lr:
     input:
         ref_genome_dir=ref_genome_dir,
         samplesheet=ALIGN_OUTPUT_DIR_GE+"/samplesheet/{sample_name_ge}_samplesheet.csv"
     output:
-        genes_counts_matrix=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/gene_raw_feature_bc_matrix/matrix.mtx.gz",
-        transcript_counts_matrix=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/transcript_raw_feature_bc_matrix/matrix.mtx.gz",
-        bam=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/tagged.bam"
+        genes_counts_matrix=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}_GE/{sample_name_ge}_GE/gene_raw_feature_bc_matrix/matrix.mtx.gz",
+        transcript_counts_matrix=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}_GE/{sample_name_ge}_GE/transcript_raw_feature_bc_matrix/matrix.mtx.gz",
+        bam=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}_GE/{sample_name_ge}_GE/tagged.bam"
     resources:
-        mem_mb = (lambda wildcards, attempt: min(attempt * 50000, 400000)),
-        time_min = (lambda wildcards, attempt: min(attempt * 2880, 10080))
+        mem_mb = (lambda wildcards, attempt: min(attempt * 50000, 600000)),
+        time_min = (lambda wildcards, attempt: min(attempt * 2880, 10080)),
     envmodules:
         "java/12.0.2",
         "nextflow/21.10.6",
@@ -74,9 +78,9 @@ rule alignment_inputs_ge_lr:
     threads:
         20
     params:
-        output_path=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/",
+        output_path=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}_GE/",
         workflow_dir=PIPELINE_FOLDER,
-        sample_id="{sample_name_ge}",
+        sample_id="{sample_name_ge}_GE",
         min_cells=min_cells,
         min_genes=min_genes,
         max_mito=max_mito,
