@@ -16,7 +16,7 @@ rule filter_bam:
         mem_mb = lambda wildcards, attempt: min(attempt * 128, 2048),
         time_min = lambda wildcards, attempt: min(attempt * 120, 360)
     conda:
-        "/mnt/beegfs02/pipelines/single-cell/lr_1.3_test/single-cell/envs/conda/5009276213d3fd3f1bcae2865c827914_.yaml"
+        PIPELINE_FOLDER+"/envs/conda/5009276213d3fd3f1bcae2865c827914_.yaml"
     threads:
         3
     shell:
@@ -33,7 +33,7 @@ rule sort_bam:
         mem_mb = lambda wildcards, attempt: min(attempt *5120 , 10240),
         time_min = lambda wildcards, attempt: min(attempt * 120, 360)
     conda:
-        "/mnt/beegfs02/pipelines/single-cell/lr_1.3_test/single-cell/envs/conda/5009276213d3fd3f1bcae2865c827914_.yaml"
+        PIPELINE_FOLDER+"/envs/conda/5009276213d3fd3f1bcae2865c827914_.yaml"
     threads:
         3
     shell:
@@ -53,7 +53,7 @@ rule variant_calling_longshot:
     params:
         input_fa=ref_genome_dir
     conda:
-        "/mnt/beegfs02/pipelines/single-cell/lr_1.3_test/single-cell/envs/conda/env_longshot.yml"
+        PIPELINE_FOLDER+"/envs/conda/env_longshot.yml"
     threads:
        1
     shell:
@@ -72,7 +72,7 @@ rule compress_index_vcf:
     threads:
         3
     conda:
-        "/mnt/beegfs02/pipelines/unofficial-snakemake-wrappers/shared_install/d58a6ebdc411f7854aad53828a4f5722_.yaml"
+        PIPELINE_FOLDER+"/envs/conda/d58a6ebdc411f7854aad53828a4f5722_.yaml"
     shell:
         """
         bcftools view --write-index=tbi --with-header -O z -o {output.vcf_longshot_output_gz} {input.vcf_longshot_input}
@@ -105,7 +105,7 @@ rule index_filtered_vcf:
     threads:
         3
     conda:
-        "/mnt/beegfs02/pipelines/single-cell/lr_1.3_test/single-cell/envs/conda/d58a6ebdc411f7854aad53828a4f5722_.yaml"
+        PIPELINE_FOLDER+"/envs/conda/d58a6ebdc411f7854aad53828a4f5722_.yaml"
     shell:
         """
         bcftools index -t {input.vcf_longshot_filtered_input} -o {index_vcf_longshot_filtered_output}

@@ -30,7 +30,7 @@ rule split_bam_by_chromosome:
         mem_mb = (lambda wildcards, attempt: min(attempt * 512, 10240)),
         time_min = lambda wildcards, attempt: min(attempt * 360, 1440)
     conda:
-        "/mnt/beegfs02/pipelines/single-cell/lr_1.3_test/single-cell/envs/conda/5009276213d3fd3f1bcae2865c827914_.yaml"
+        PIPELINE_FOLDER+"/envs/conda/5009276213d3fd3f1bcae2865c827914_.yaml"
     shell:
         """
         mkdir -pv {params.dir_split_chrom}
@@ -82,7 +82,7 @@ rule split_bams_by_barcodes:
         mem_mb = (lambda wildcards, attempt: min(attempt * 1024, 2048)),
         runtime = lambda wildcards, attempt: min(attempt * 180, 360)
     conda:
-        "/mnt/beegfs02/pipelines/single-cell/lr_1.3_test/single-cell/envs/conda/5009276213d3fd3f1bcae2865c827914_.yaml"
+        PIPELINE_FOLDER+"envs/conda/5009276213d3fd3f1bcae2865c827914_.yaml"
     shell:
         """
         if [ {input.chr} ]; then
@@ -120,7 +120,7 @@ rule merge_split_bam:
         mem_mb = lambda wildcards, attempt: min(attempt *1024, 2048),
         runtime = lambda wildcards, attempt: min(attempt * 360, 1440)
     conda:
-        "/mnt/beegfs02/pipelines/single-cell/lr_1.3_test/single-cell/envs/conda/5009276213d3fd3f1bcae2865c827914_.yaml"
+        PIPELINE_FOLDER+"envs/conda/5009276213d3fd3f1bcae2865c827914_.yaml"
     shell:
         """
         for i in `cat {input.batch}`;
@@ -152,7 +152,7 @@ rule mpileup_by_barcodes:
         mem_mb = lambda wildcards, attempt: min(attempt * 512, 2048),
         runtime = lambda wildcards, attempt: min(attempt * 30, 60)
     conda:
-        "/mnt/beegfs02/pipelines/single-cell/lr_1.3_test/single-cell/envs/conda/bam_readcount.yaml"
+        PIPELINE_FOLDER+"/envs/conda/bam_readcount.yaml"
     shell:
         """
         mkdir -p {params.output_dir}
@@ -188,7 +188,7 @@ rule create_snp_matrix:
     threads:
         1
     conda:
-        "/mnt/beegfs02/pipelines/single-cell/lr_1.3_test/single-cell/envs/conda/env_pyvcf.yaml"
+       PIPELINE_FOLDER+"/envs/conda/env_pyvcf.yaml"
     resources:
         mem_mb = lambda wildcards, attempt: min(attempt * 1024, 5120),
         runtime = lambda wildcards, attempt: min(attempt * 60, 120)
