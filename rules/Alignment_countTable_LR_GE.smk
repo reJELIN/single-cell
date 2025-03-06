@@ -71,12 +71,10 @@ rule alignment_inputs_ge_lr:
     resources:
         mem_mb = (lambda wildcards, attempt: min(attempt * 50000, 600000)),
         time_min = (lambda wildcards, attempt: min(attempt * 2880, 10080)),
-    envmodules:
-        "java/12.0.2",
-        "nextflow/21.10.6",
-        "singularity/3.6.3",
     threads:
         20
+    conda:
+        "/mnt/beegfs02/pipelines/single-cell/envs/conda/nextflow.yaml"
     params:
         output_path=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}_GE/",
         workflow_dir=PIPELINE_FOLDER,

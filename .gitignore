@@ -13,3 +13,5 @@ envs/conda/e687c6de5b4a81e4fc8967553837408d_
 envs/conda/f7aeea1eed26054427054dde8d9855c7_
 */__pycache__/*
 .snakemake
+test/*
+test

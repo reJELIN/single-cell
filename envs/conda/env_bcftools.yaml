@@ -43,4 +43,3 @@ dependencies:
   - vcftools=0.1.16=pl5321h077b44d_12
   - zlib=1.3.1=hb9d3cd8_2
   - zstd=1.5.6=ha6fb4c9_0
-prefix: /mnt/beegfs/userdata/r_jelin/conda_install/miniforge3/envs/bcftools

@@ -43,4 +43,3 @@ dependencies:
   - tzdata=2024a=h0c530f3_0
   - wheel=0.44.0=pyhd8ed1ab_0
   - xz=5.4.6=h5eee18b_1
-prefix: /mnt/beegfs/userdata/r_jelin/conda_install/miniconda3/envs/env_pyvcf

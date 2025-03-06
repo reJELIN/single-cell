@@ -44,4 +44,3 @@ dependencies:
   - xz=5.2.10=h5eee18b_1
   - zlib=1.2.13=h166bdaf_4
   - zstd=1.5.5=hc292b87_0
-prefix: /mnt/beegfs/userdata/r_jelin/conda_install/miniconda3/envs/env_longshot

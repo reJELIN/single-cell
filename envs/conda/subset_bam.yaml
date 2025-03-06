@@ -8,4 +8,3 @@ channels:
   - plotly
 dependencies:
   - subset-bam=1.1.0=h4349ce8_0
-prefix: /mnt/beegfs/userdata/r_jelin/conda_install/miniforge3/envs/subset_bam

@@ -47,9 +47,9 @@ gtf_file <- args$option$gtf_file
 species_ensembl <- args$option$species
 isoform_transcript_matrix <- args$option$path_isoform_transcript_matrix
 
-if(species_ensembl == "human"){ensemble2gene <- read.table(file="/mnt/beegfs/pipelines/single-cell/lr_1.3_test/single-cell/common/database/ensembl_hsapiens.txt",header=T,sep="\t")}
+if(species_ensembl == "human"){ensemble2gene <- read.table(file="/mnt/beegfs02/pipelines/single-cell/common/database/ensembl_hsapiens.txt",header=T,sep="\t")}
 
-if(species_ensembl == "mouse"){ensemble2gene <- read.table(file="/mnt/beegfs/pipelines/single-cell/lr_1.3_test/single-cell/common/database/ensembl_mmusculus.txt",header=T,sep="\t")}
+if(species_ensembl == "mouse"){ensemble2gene <- read.table(file="/mnt/beegfs02/pipelines/single-cell/common/database/ensembl_mmusculus.txt",header=T,sep="\t")}
 
 quite_message <- function(message_txt){
     message(message_txt)

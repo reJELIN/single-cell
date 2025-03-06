@@ -25,9 +25,8 @@ while getopts ":s:o:r:g:c:m:f:n:" option; do
 done
 
 
-module load java/12.0.2
-module load nextflow/21.10.6
-module load singularity/3.6.3
+module load java/21.0.6-jdk
+module load singularity-ce/4.2.2
 
 export TMPDIR=${tmpdir}
 
@@ -35,12 +34,12 @@ echo "TMP DIR: ${TMPDIR}"
 
 #parameters
 pipeline_version="v2.0.3"
-path_to_pipeline="/mnt/beegfs/pipelines/wf-scLongReads_Nanopore/"${pipeline_version}"/wf-single-cell/"
+path_to_pipeline="/mnt/beegfs02/pipelines/wf-scLongReads_Nanopore/"${pipeline_version}"/wf-single-cell/"
 
 mkdir -p ${output_dir_path}
 
 #launch
-export NXF_SINGULARITY_CACHEDIR="/mnt/beegfs/pipelines/wf-scLongReads_Nanopore/"${pipeline_version}"/sing_img/"
+export NXF_SINGULARITY_CACHEDIR="/mnt/beegfs02/pipelines/wf-scLongReads_Nanopore/"${pipeline_version}"/sing_img/"
 nextflow run ${path_to_pipeline} \
     -w ${output_dir_path}/workspace \
     -profile singularity \
