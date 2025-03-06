@@ -1307,13 +1307,13 @@ if "Cerebro" in STEPS:
 
 #singularity
 if "Droplets_QC_GE" in STEPS or "Filtering_GE" in STEPS or "Norm_DimRed_Eval_GE" in STEPS or "Clust_Markers_Annot_GE" in STEPS or "Adding_ADT" in STEPS or "Int_Clust_Markers_Annot_GE" in STEPS or "Grp_Norm_DimRed_Eval_GE" in STEPS or "Grp_Clust_Markers_Annot_GE" in STEPS:
-    SINGULARITY_ENV = "/mnt/beegfs02/pipelines/bigr_single-cell/1.3_lr/envs/singularity/single_cell.simg"
+    SINGULARITY_ENV = PIPELINE_FOLDER+"/envs/singularity/single_cell.simg"
 if "Int_Norm_DimRed_Eval_GE" in STEPS :
     INT_SINGULARITY_ENV =  "/mnt/beegfs02/pipelines/bigr_single_cell/1.3/envs/singularity/single_cell_integration.simg"
 if "Alignment_annotations_TCR_BCR" in STEPS or "Adding_TCR" in STEPS or "Adding_BCR" in STEPS or "Int_Adding_TCR" in STEPS or "Int_Adding_BCR" in STEPS or "Grp_Adding_TCR" in STEPS or "Grp_Adding_BCR" in STEPS:
     SINGULARITY_ENV_TCR_BCR =  "/mnt/beegfs02/pipelines/bigr_single-cell/1.3/envs/singularity/single_cell_TCR_BCR.simg"
 if "Isoform_Markers_GE" or "Int_isoform_Markers" in STEPS:
-     SINGULARITY_ENV_LR =  "/mnt/beegfs02/pipelines/bigr_single-cell/1.3_lr/envs/singularity/single_cell_lr.simg"
+     SINGULARITY_ENV_LR =  PIPELINE_FOLDER+"/envs/singularity/single_cell_lr.simg"
 
 
 ### rule all ###################################################################################################################################
