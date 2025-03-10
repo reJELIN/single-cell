@@ -82,7 +82,7 @@ rule split_bams_by_barcodes:
         mem_mb = (lambda wildcards, attempt: min(attempt * 1024, 2048)),
         runtime = lambda wildcards, attempt: min(attempt * 180, 360)
     conda:
-        PIPELINE_FOLDER+"envs/conda/5009276213d3fd3f1bcae2865c827914_.yaml"
+        PIPELINE_FOLDER+"/envs/conda/5009276213d3fd3f1bcae2865c827914_.yaml"
     shell:
         """
         if [ {input.chr} ]; then
@@ -120,7 +120,7 @@ rule merge_split_bam:
         mem_mb = lambda wildcards, attempt: min(attempt *1024, 2048),
         runtime = lambda wildcards, attempt: min(attempt * 360, 1440)
     conda:
-        PIPELINE_FOLDER+"envs/conda/5009276213d3fd3f1bcae2865c827914_.yaml"
+        PIPELINE_FOLDER+"/envs/conda/5009276213d3fd3f1bcae2865c827914_.yaml"
     shell:
         """
         for i in `cat {input.batch}`;
