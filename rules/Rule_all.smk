@@ -139,8 +139,7 @@ def get_targets(STEPS):
         expand(ALIGN_OUTPUT_DIR_GE+ "/{sample_name_ge}/" + FILTERS_FOLDER + "/DOUBLETSFILTER_all/{sample_name_ge}_FILTERED_barcodes.txt",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
         expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/split_chrom/tagged_sort_"+chr_list[0]+".bam",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
         expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/barcodes_batch/{sample_name_ge}_barcodes_list_{batch_number}.txt",sample_name_ge=ALIGN_SAMPLE_NAME_GE,batch_number=batch_number_seq),
-        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/tmp_barcodes/DONE_{sample_name_ge}_barcodes_list_{batch_number}.txt",sample_name_ge=ALIGN_SAMPLE_NAME_GE,batch_number=batch_number_seq),
-        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/tmp_merge/DONE_{sample_name_ge}_barcodes_list_{batch_number}.txt",sample_name_ge=ALIGN_SAMPLE_NAME_GE,batch_number=batch_number_seq),
+        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/tmp/end_of_split_bam_per_bc.DONE",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
         expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/tmp_mpileup/DONE_{sample_name_ge}_barcodes_list_{batch_number}.txt",sample_name_ge=ALIGN_SAMPLE_NAME_GE,batch_number=batch_number_seq),
         expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/matrix_SNP_{sample_name_ge}.tsv",sample_name_ge=ALIGN_SAMPLE_NAME_GE,batch_number=batch_number_seq)
         ]
