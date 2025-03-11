@@ -65,83 +65,45 @@ rule create_batch_list:
         --batch_id {params.batch_id}
         """
 
-rule split_bams_by_barcodes:
+rule split_bam_per_bc:
     input:
-        batch=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/barcodes_batch/{sample_name_ge}_barcodes_list_{batch_number}.txt",
-        chr=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/split_chrom/tagged_sort_"+chr_list[0]+".bam"
+        tagged_bam=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/tagged.bam"
     output:
-        barcodes_batch_done=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/tmp_barcodes/DONE_{sample_name_ge}_barcodes_list_{batch_number}.txt"
+        end_of_run=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/tmp/end_of_split_bam_per_bc.DONE"
     params:
-        output_dir=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/barcodes_bam/",
-        split_chrom_dir=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/split_chrom/",
-        done_dir=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/tmp_barcodes/",
-        chrom_list=chr_list
+        datadir=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}"
     threads:
-        3
+        4
     resources:
-        mem_mb = (lambda wildcards, attempt: min(attempt * 1024, 2048)),
-        runtime = lambda wildcards, attempt: min(attempt * 360, 920)
+        mem_mb = lambda wildcards, attempt: min(attempt * 1024 * 15, 1024*45),
+        time_min = lambda wildcards, attempt: min(attempt * 360, 920)
     conda:
         PIPELINE_FOLDER+"/envs/conda/5009276213d3fd3f1bcae2865c827914_.yaml"
     shell:
         """
-        if [ {input.chr} ]; then
-            echo "Split bam by chromosome has been made...continue!"
-        fi
-        
-        mkdir -p {params.output_dir}
-    
-        for i in `cat {input.batch}`;
-        do 
-        	echo $i
-        	mkdir -p {params.output_dir}$i
-        	for j in {params.chrom_list};
-        	do
-        		j_bam="{params.split_chrom_dir}tagged_sort_$j.bam"
-        		samtools view -h -@ 3 --bam -o {params.output_dir}/$i/$i.$j.bam -d "CB:$i" $j_bam
-        	done
-        done
-        
-        mkdir -p {params.done_dir}
-        cp {input.batch} {output.barcodes_batch_done}
-        """
+        mkdir -p {params.datadir}/tmp
+        mkdir -p {params.datadir}/per_cell_bams
 
-rule merge_split_bam:
-    input:
-        batch=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/tmp_barcodes/DONE_{sample_name_ge}_barcodes_list_{batch_number}.txt"
-    output:
-        barcodes_batch_done=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/tmp_merge/DONE_{sample_name_ge}_barcodes_list_{batch_number}.txt"
-    params:
-        input_dir=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/barcodes_bam/",
-        done_dir=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/tmp_merge/"
-    threads:
-        1
-    resources:
-        mem_mb = lambda wildcards, attempt: min(attempt *1024, 2048),
-        runtime = lambda wildcards, attempt: min(attempt * 360, 1440)
-    conda:
-        PIPELINE_FOLDER+"/envs/conda/5009276213d3fd3f1bcae2865c827914_.yaml"
-    shell:
-        """
-        for i in `cat {input.batch}`;
-        do
-            echo $i
-            samtools cat {params.input_dir}$i/$i.*.bam -o {params.input_dir}$i/$i.merge.bam
-            samtools sort {params.input_dir}$i/$i.merge.bam -o {params.input_dir}$i/$i.merge_sort.bam
-            samtools index -b {params.input_dir}$i/$i.merge_sort.bam
-            
-        done
-        mkdir -p {params.done_dir}
-        cp {input.batch} {output.barcodes_batch_done}
+        samtools split --max-split 20000 \
+        -d CB \
+        --threads {threads} \
+        -f '{params.datadir}/per_cell_bams/%!.bam' \
+        --no-PG \
+        {input.tagged_bam}
+
+        samtools index -@ 3 -M {params.datadir}/per_cell_bams/*.bam
+
+        touch {output.end_of_run}
         """
 
 rule mpileup_by_barcodes:
     input:
-        batch=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/tmp_merge/DONE_{sample_name_ge}_barcodes_list_{batch_number}.txt"
+        end_of_=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/tmp/end_of_split_bam_per_bc.DONE"
+         batch=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/barcodes_batch/{sample_name_ge}_barcodes_list_{batch_number}.txt"
     output:
         barcodes_batch_done=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/tmp_mpileup/DONE_{sample_name_ge}_barcodes_list_{batch_number}.txt"
     params:
-        input_dir=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/barcodes_bam/",
+        input_dir=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/per_cell_bams/",
         output_dir=ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/barcodes_pileup/",
         ref_genome=ref_genome,
         bed_file=BED_FILE,
@@ -162,7 +124,7 @@ rule mpileup_by_barcodes:
             bam-readcount \
             -l {params.bed_file} \
             -f {params.ref_genome} \
-            {params.input_dir}$i/$i.merge_sort.bam > {params.output_dir}$i.tsv
+            {params.input_dir}$i.bam > {params.output_dir}$i.tsv
         done
         mkdir -p {params.barcodes_batch_done_dir}
         cp {input.batch} {output.barcodes_batch_done}
