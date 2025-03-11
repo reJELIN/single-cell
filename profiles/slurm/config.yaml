@@ -11,4 +11,4 @@ reason: false
 printshellcmds: true
 jobname: "{name}.{jobid}.snakejob"
 use-conda: true
-conda-prefix: /mnt/beegfs/pipelines/single-cell/lr_1.3_test/single-cell/envs/conda
+conda-prefix: /mnt/beegfs02/pipelines/bigr_single-cell/1.3_lr/envs/conda_compiled

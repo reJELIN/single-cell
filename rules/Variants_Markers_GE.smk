@@ -80,7 +80,7 @@ rule split_bams_by_barcodes:
         3
     resources:
         mem_mb = (lambda wildcards, attempt: min(attempt * 1024, 2048)),
-        runtime = lambda wildcards, attempt: min(attempt * 180, 360)
+        runtime = lambda wildcards, attempt: min(attempt * 360, 920)
     conda:
         PIPELINE_FOLDER+"/envs/conda/5009276213d3fd3f1bcae2865c827914_.yaml"
     shell:
