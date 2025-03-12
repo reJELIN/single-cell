@@ -76,7 +76,7 @@ rule split_bam_per_bc:
         4
     resources:
         mem_mb = lambda wildcards, attempt: min(attempt * 1024 * 15, 1024*45),
-        time_min = lambda wildcards, attempt: min(attempt * 360, 920)
+        time_min = lambda wildcards, attempt: min(attempt * 420, 1440)
     conda:
         PIPELINE_FOLDER+"/envs/conda/5009276213d3fd3f1bcae2865c827914_.yaml"
     shell:
