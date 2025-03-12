@@ -13,7 +13,7 @@ rule extract_barcodes_from_rda:
         time_min = lambda wildcards, attempt: min(attempt * 10, 30)
     shell:
         """
-        module load singularity
+        module load singularity-ce/4.2.2
         singularity exec --no-home -B {params.directory_rda}:{params.directory_rda} -B {params.workflow_dir}:{params.workflow_dir} {params.workflow_dir}/envs/singularity/single_cell.simg Rscript \
         {params.workflow_dir}/scripts/LR/get_barcodes.R \
         --input_rda_ge {input.rda_file} \
