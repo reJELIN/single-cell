@@ -112,7 +112,7 @@ rule mpileup_by_barcodes:
         1
     resources:
         mem_mb = lambda wildcards, attempt: min(attempt * 512, 2048),
-        runtime = lambda wildcards, attempt: min(attempt * 30, 60)
+        runtime = lambda wildcards, attempt: min(attempt * 360, 720)
     conda:
         PIPELINE_FOLDER+"/envs/conda/bam_readcount.yaml"
     shell:
