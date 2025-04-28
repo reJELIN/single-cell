@@ -1,0 +1,1 @@
+Mar-26 09:25:47.452 [main] DEBUG nextflow.cli.Launcher - $> nextflow run /mnt/beegfs02/pipelines/wf-scLongReads_Nanopore/v2.0.3/wf-single-cell/ -h

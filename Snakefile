@@ -95,13 +95,13 @@ if "Alignment_countTable_LR_GE" in STEPS:
     else:
         design_file=pd.read_csv(DESIGN_FILE_GE,sep=',')
         
-    expected_columns=['sample_id', 'path_to_fastq', 'expected_cells', 'kit_name','kit_version']
+    expected_columns=['sample_id', 'path_to_fastq', 'exp_cells', 'kit']
     #check element in both lists : header of the design file and list of expected column
     header_check=all(x == y for x, y in 
                      zip(design_file.columns, expected_columns))
 
     if header_check is not True:
-        raise SyntaxError("Your design file accept only this columns: sample_id, path_to_fastq, expected_cells, kit_name,kit_version")
+        raise SyntaxError("Your design file accept only this columns: sample_id, path_to_fastq, exp_cells, kit")
     
     #if config['Alignment_countTable_LR_GE']['sample.name.ge'] not in list(design_file.loc[['sample_id']].value):
     #    raise ValueError("Your sample(s) are not present in the design file")

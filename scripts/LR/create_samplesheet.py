@@ -22,4 +22,4 @@ row = design_file.loc[design_file["sample_id"] == args.sample_id]
 
 row['sample_id'] = args.sample_id+"_GE"
 
-row[["sample_id", "kit_name","kit_version","expected_cells"]].to_csv(output_file,sep=",",index=False)
+row[["sample_id","kit","exp_cells"]].to_csv(output_file,sep=",",index=False) #older: expected_cells
