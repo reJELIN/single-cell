@@ -104,12 +104,11 @@ if "resources" in job_properties:
             arg_dict["partition"] = "verylongq"
         else:
             raise ValueError("Too much time requested: {}".format(str(arg_dict["time"])))
-        if arg_dict["mem"] > 200000:
+        if arg_dict["mem"] >= 200000:
             arg_dict["partition"] = "bigmemq"
-            
-    if arg_dict["partition"] is None:        
-        if arg_dict["mem"] > 200000:
-            arg_dict["partition"] = "bigmemq"
+    #if arg_dict["partition"] is None:        
+    #    if arg_dict["mem"] > 200000 and arg_dict["time"] > 10080:
+    #        arg_dict["partition"] = "bigmemq"
 
 
 # Threads
@@ -141,7 +140,7 @@ for k, v in arg_dict.items():
 if arg_dict["wrap"] is not None:
     cmd = "sbatch {opts}".format(opts=opts)
 else:
-    cmd = "sbatch {opts} --exclude=n04,n06 {extras}".format(opts=opts, extras=extras)
+    cmd = "sbatch {opts} {extras}".format(opts=opts, extras=extras)
 
 try:
     res = subprocess.run(cmd, check=True, shell=True, stdout=subprocess.PIPE)

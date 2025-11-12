@@ -54,32 +54,39 @@ rule grp_clust_markers_annot_ge:
         SING_GRP_CMA_MARKFILE = ','.join([os.path.normpath("/WORKDIR/" + x) for x in GRP_CMA_MARKFILE.split(',')]) if GRP_CMA_MARKFILE != "NULL" else "NULL",
         SING_GRP_CMA_METADATA_FILE = ','.join([os.path.normpath("/WORKDIR/" + x) for x in GRP_CMA_METADATA_FILE.split(',')]) if GRP_CMA_METADATA_FILE != "NULL" else "NULL",
         SING_GRP_CMA_CUSTOM_SCE_REF = ','.join([os.path.normpath("/WORKDIR/" + x) for x in GRP_CMA_CUSTOM_SCE_REF.split(',')]) if GRP_CMA_CUSTOM_SCE_REF != "NULL" else "NULL",
-        SING_GRP_CMA_CUSTOM_MARKERS_REF = ','.join([os.path.normpath("/WORKDIR/" + x) for x in GRP_CMA_CUSTOM_MARKERS_REF.split(',')]) if GRP_CMA_CUSTOM_MARKERS_REF != "NULL" else "NULL"
+        SING_GRP_CMA_CUSTOM_MARKERS_REF = ','.join([os.path.normpath("/WORKDIR/" + x) for x in GRP_CMA_CUSTOM_MARKERS_REF.split(',')]) if GRP_CMA_CUSTOM_MARKERS_REF != "NULL" else "NULL",
+        SINGULARITY_ENV = SINGULARITY_ENV,
+        GRP_CMA_AUTHOR_NAME = GRP_CMA_AUTHOR_NAME,
+        GRP_CMA_AUTHOR_MAIL = GRP_CMA_AUTHOR_MAIL,
+        GRP_CMA_KEEP_DIM = GRP_CMA_KEEP_DIM,
+        GRP_CMA_KEEP_RES = GRP_CMA_KEEP_RES,
+        GRP_CMA_CFR_MINSCORE = GRP_CMA_CFR_MINSCORE,
+        GRP_CMA_SR_MINSCORE = GRP_CMA_SR_MINSCORE
     threads:
         1
     resources:
-        mem_mb = (lambda wildcards, attempt: min(10240 + attempt * 15360, 102400)),
-        time_min = (lambda wildcards, attempt: min(attempt * 360, 1440))
+        mem_mb = lambda wildcards, attempt: 10240 + attempt * 20480,
+        time_min = lambda wildcards, attempt: attempt * 360
     shell:
         """
-        export TMPDIR={GLOBAL_TMP}
+        export TMPDIR=$TMPDIR
         TMP_DIR=$(mktemp -d -t sc_pipeline-XXXXXXXXXX) && \
         singularity exec --no-home -B $TMP_DIR:/tmp -B $TMP_DIR:$HOME {params.sing_grp_bind} \
-        {SINGULARITY_ENV} \
+        {params.SINGULARITY_ENV} \
         Rscript {params.pipeline_folder}/scripts/Grouped_analysis_part2.R \
         --input.rda.grp {params.grp_input_rda} \
         --output.dir.grp {params.grp_output_folder} \
-        --author.name {GRP_CMA_AUTHOR_NAME} \
-        --author.mail {GRP_CMA_AUTHOR_MAIL} \
+        --author.name {params.GRP_CMA_AUTHOR_NAME} \
+        --author.mail {params.GRP_CMA_AUTHOR_MAIL} \
         --nthreads {threads} \
         --pipeline.path {params.pipeline_folder} \
         --markfile  {params.SING_GRP_CMA_MARKFILE} \
         --custom.sce.ref {params.SING_GRP_CMA_CUSTOM_SCE_REF} \
         --custom.markers.ref {params.SING_GRP_CMA_CUSTOM_MARKERS_REF} \
-        --keep.dims {GRP_CMA_KEEP_DIM} \
-        --keep.res {GRP_CMA_KEEP_RES} \
-        --cfr.minscore {GRP_CMA_CFR_MINSCORE} \
-        --sr.minscore {GRP_CMA_SR_MINSCORE} \
+        --keep.dims {params.GRP_CMA_KEEP_DIM} \
+        --keep.res {params.GRP_CMA_KEEP_RES} \
+        --cfr.minscore {params.GRP_CMA_CFR_MINSCORE} \
+        --sr.minscore {params.GRP_CMA_SR_MINSCORE} \
         --metadata.file {params.SING_GRP_CMA_METADATA_FILE} && \
         rm -r $TMP_DIR || rm -r $TMP_DIR
         """

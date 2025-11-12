@@ -125,9 +125,9 @@ def get_targets(STEPS):
     if "Alignment_countTable_LR_GE" in STEPS:
         targets["Alignment_countTable_LR_GE"]=[
         expand(ALIGN_OUTPUT_DIR_GE+"/samplesheet/{sample_name_ge}_samplesheet.csv",sample_name_ge=ALIGN_SAMPLE_NAME),
-        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}_GE/{sample_name_ge}_GE/gene_raw_feature_bc_matrix/matrix.mtx.gz",sample_name_ge=ALIGN_SAMPLE_NAME),
-        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}_GE/{sample_name_ge}_GE/transcript_raw_feature_bc_matrix/matrix.mtx.gz",sample_name_ge=ALIGN_SAMPLE_NAME),
-        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}_GE/{sample_name_ge}_GE/tagged.bam",sample_name_ge=ALIGN_SAMPLE_NAME)
+        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}_GE/{sample_name_ge}_GE/{sample_name_ge}_GE.gene_raw_feature_bc_matrix/matrix.mtx.gz",sample_name_ge=ALIGN_SAMPLE_NAME),
+        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}_GE/{sample_name_ge}_GE/{sample_name_ge}_GE.transcript_raw_feature_bc_matrix/matrix.mtx.gz",sample_name_ge=ALIGN_SAMPLE_NAME),
+        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}_GE/{sample_name_ge}_GE/{sample_name_ge}_GE.tagged.bam",sample_name_ge=ALIGN_SAMPLE_NAME)
         ]
     if "Isoform_Markers_GE" in STEPS:
         targets["Isoform_Markers_GE"]=[
@@ -135,14 +135,20 @@ def get_targets(STEPS):
         expand(ISFORM_MTX_INTPUT[0]+"{sample_name_ge}/{sample_name_ge}/{sample_name_ge}_"+CMA_CLUST_FOLDER+"_sobj_isoform.rda",sample_name_ge=ISOFORM_SAMPLE_NAME_GE)
         ]
     if "Variants_Markers_GE" in STEPS:
-        targets["Variants_Markers_GE"]=[
-        expand(ALIGN_OUTPUT_DIR_GE+ "/{sample_name_ge}/" + FILTERS_FOLDER + "/DOUBLETSFILTER_all/{sample_name_ge}_FILTERED_barcodes.txt",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
-        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/split_chrom/tagged_sort_"+chr_list[0]+".bam",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
-        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/barcodes_batch/{sample_name_ge}_barcodes_list_{batch_number}.txt",sample_name_ge=ALIGN_SAMPLE_NAME_GE,batch_number=batch_number_seq),
-        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/tmp/end_of_split_bam_per_bc.DONE",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
-        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/tmp_mpileup/DONE_{sample_name_ge}_barcodes_list_{batch_number}.txt",sample_name_ge=ALIGN_SAMPLE_NAME_GE,batch_number=batch_number_seq),
-        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/matrix_SNP_{sample_name_ge}.tsv",sample_name_ge=ALIGN_SAMPLE_NAME_GE,batch_number=batch_number_seq)
-        ]
+        if split_chrom_only:
+            targets["Variants_Markers_GE"]=[
+            expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/split_chrom/tagged_sort_"+chr_list[0]+".bam",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
+            expand(ALIGN_OUTPUT_DIR_GE+ "/{sample_name_ge}/" + FILTERS_FOLDER + "/DOUBLETSFILTER_all/{sample_name_ge}_FILTERED_barcodes.txt",sample_name_ge=ALIGN_SAMPLE_NAME_GE)
+            ]
+        else:
+            targets["Variants_Markers_GE"]=[
+            expand(ALIGN_OUTPUT_DIR_GE+ "/{sample_name_ge}/" + FILTERS_FOLDER + "/DOUBLETSFILTER_all/{sample_name_ge}_FILTERED_barcodes.txt",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
+            expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/split_chrom/tagged_sort_"+chr_list[0]+".bam",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
+            expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/barcodes_batch/{sample_name_ge}_barcodes_list_{batch_number}.txt",sample_name_ge=ALIGN_SAMPLE_NAME_GE,batch_number=batch_number_seq),
+            expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/tmp/end_of_split_bam_per_bc.DONE",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
+            expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/tmp_mpileup/DONE_{sample_name_ge}_barcodes_list_{batch_number}.txt",sample_name_ge=ALIGN_SAMPLE_NAME_GE,batch_number=batch_number_seq),
+            expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/matrix_SNP_{sample_name_ge}.tsv",sample_name_ge=ALIGN_SAMPLE_NAME_GE,batch_number=batch_number_seq)
+            ]
     if "Variants_Calling_GE" in STEPS:
         targets["Variants_Calling_GE"]=[
         expand(ALIGN_OUTPUT_DIR_GE+ "/{sample_name_ge}/" + FILTERS_FOLDER + "/DOUBLETSFILTER_all/{sample_name_ge}_FILTERED_barcodes.txt",sample_name_ge=ALIGN_SAMPLE_NAME_GE),

@@ -36,7 +36,22 @@ rule norm_dimred_ge:
         pipeline_folder = os.path.normpath("/WORKDIR/" + PIPELINE_FOLDER),
         input_rda = lambda wildcards, input: os.path.normpath("/WORKDIR/" + input[0]),
         output_folder = os.path.normpath("/WORKDIR/" + "{output_norm_dimred_dir_ge}") + "/",
-        SING_NDRE_METADATA_FILE = ','.join([os.path.normpath("/WORKDIR/" + x) for x in NDRE_METADATA_FILE.split(',')]) if NDRE_METADATA_FILE != "NULL" else "NULL"
+        SING_NDRE_METADATA_FILE = ','.join([os.path.normpath("/WORKDIR/" + x) for x in NDRE_METADATA_FILE.split(',')]) if NDRE_METADATA_FILE != "NULL" else "NULL",
+        ndre_author_name = NDRE_AUTHOR_NAME,
+        ndre_author_mail = NDRE_AUTHOR_MAIL,
+        ndre_eval_markers = NDRE_EVAL_MARKERS,
+        ndre_features_n = NDRE_FEATURES_N,
+        ndre_norm_method = NDRE_NORM_METHOD,
+        ndre_dimred_method = NDRE_DIMRED_METHOD,
+        ndre_vtr_biases = NDRE_VTR_BIASES,
+        ndre_vtr_scale = NDRE_VTR_SCALE,
+        ndre_dim_max = NDRE_DIM_MAX,
+        ndre_dim_min = NDRE_DIM_MIN,
+        ndre_dim_steps = NDRE_DIM_STEPS,
+        ndre_res_max = NDRE_RES_MAX,
+        ndre_res_min = NDRE_RES_MIN,
+        ndre_res_steps = NDRE_RES_STEPS,
+        singularity_env =  SINGULARITY_ENV
     threads:
         4
     resources:
@@ -44,29 +59,29 @@ rule norm_dimred_ge:
         time_min = (lambda wildcards, attempt: min(attempt * 120, 200))
     shell:
         """
-        export TMPDIR={GLOBAL_TMP}
+        export TMPDIR=$TMPDIR
         TMP_DIR=$(mktemp -d -t sc_pipeline-XXXXXXXXXX) && \
         singularity exec --no-home -B $TMP_DIR:/tmp {params.sing_bind} \
-        {SINGULARITY_ENV} \
+        {params.singularity_env} \
         Rscript {params.pipeline_folder}/scripts/pipeline_part3.R \
         --input.rda.ge {params.input_rda} \
         --output.dir.ge {params.output_folder} \
-        --author.name {NDRE_AUTHOR_NAME} \
-        --author.mail {NDRE_AUTHOR_MAIL} \
+        --author.name {params.ndre_author_name} \
+        --author.mail {params.ndre_author_mail} \
         --nthreads {threads} \
         --pipeline.path {params.pipeline_folder} \
-        --eval.markers {NDRE_EVAL_MARKERS} \
-        --features.n {NDRE_FEATURES_N} \
-        --norm.method {NDRE_NORM_METHOD} \
-        --dimred.method {NDRE_DIMRED_METHOD} \
-        --vtr.biases {NDRE_VTR_BIASES} \
-        --vtr.scale {NDRE_VTR_SCALE} \
-        --dims.max {NDRE_DIM_MAX} \
-        --dims.min {NDRE_DIM_MIN} \
-        --dims.steps {NDRE_DIM_STEPS} \
-        --res.max {NDRE_RES_MAX} \
-        --res.min {NDRE_RES_MIN} \
-        --res.steps {NDRE_RES_STEPS} \
+        --eval.markers {params.ndre_eval_markers} \
+        --features.n {params.ndre_features_n} \
+        --norm.method {params.ndre_norm_method} \
+        --dimred.method {params.ndre_dimred_method} \
+        --vtr.biases {params.ndre_vtr_biases} \
+        --vtr.scale {params.ndre_vtr_scale} \
+        --dims.max {params.ndre_dim_max} \
+        --dims.min {params.ndre_dim_min} \
+        --dims.steps {params.ndre_dim_steps} \
+        --res.max {params.ndre_res_max} \
+        --res.min {params.ndre_res_min} \
+        --res.steps {params.ndre_res_steps} \
         --metadata.file {params.SING_NDRE_METADATA_FILE} && \
         rm -r $TMP_DIR || rm -r $TMP_DIR
         """

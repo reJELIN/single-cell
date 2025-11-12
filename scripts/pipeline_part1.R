@@ -194,9 +194,10 @@ cl <- create.parallel.instance(nthreads = nthreads)
 ### Building output directory
 unfiltred.dir <- paste0(output.dir.ge, 'QC_droplets', if(!is.null(emptydrops.retain)) '_retain', emptydrops.retain, '/')
 dir.create(path = unfiltred.dir, recursive = TRUE, showWarnings = FALSE)
-
+print("translation:")
+print(translation)
 ### Loading raw count matrix + Filtering duplicated cell barcodes + Removing empty droplets
-sobj <- load.sc.data(data.path = input.dir.ge, sample.name = sample.name.GE, assay = assay, droplets.limit = droplets.limit, emptydrops.fdr = emptydrops.fdr, emptydrops.retain = emptydrops.retain, translation = translation, translation.file = translation.file, BPPARAM = cl, my.seed = my.seed, out.dir = unfiltred.dir,sequencing_type = sequencing_type_info)
+sobj <- load.sc.data(data.path = input.dir.ge, sample.name = sample.name.GE, assay = assay, droplets.limit = droplets.limit, emptydrops.fdr = emptydrops.fdr, emptydrops.retain = emptydrops.retain, translation = translation, translation.file = translation.file, BPPARAM = cl, my.seed = my.seed, out.dir = unfiltred.dir)
 
 ### Add metadata
 if(!is.null(metadata.file)) sobj <- add_metadata_sobj(sobj=sobj, metadata.file = metadata.file)

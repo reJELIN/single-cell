@@ -102,15 +102,13 @@ if "resources" in job_properties:
             arg_dict["partition"] = "longq"
         elif 10080 <= arg_dict["time"] < 86400:
             arg_dict["partition"] = "verylongq"
+        elif arg_dict["mem"] >= 200000:
+            arg_dict["partition"] = "gpgpuq"
         else:
             raise ValueError("Too much time requested: {}".format(str(arg_dict["time"])))
-        
-    if arg_dict["mem"] >= 200000:
-        arg_dict["partition"] = "gpgpuq"
-    #if arg_dict["partition"] is None:
-    #    if arg_dict["mem"] >= 200000:
-    #        arg_dict["partition"] = "bigmemq"
 
+    #if arg_dict["mem"] >= 200000:
+    #    arg_dict["partition"] = "gpgpuq"
 
 # Threads
 if "threads" in job_properties:

@@ -255,7 +255,7 @@ if(keep.norm){
   cat("\nNormalization...\n")
   sobj <- sc.normalization(sobj = sobj, assay = assay, normalization.method = norm.method, features.n = features.n, vtr.biases = normalization.vtr)
   if(tolower(norm.method) == 'sctransform') assay <- 'SCT'
-  norm_vtr = paste0(norm.method, if(!is.na(sobj@assays[[assay]]@misc$scaling$vtr.biases[1])) paste(sobj@assays[[assay]]@misc$scaling$vtr.biases, collapse = '_') else NULL)
+  norm_vtr = paste0(c(norm.method, if(!is.na(sobj@assays[[assay]]@misc$scaling$vtr.biases[1])) paste(sobj@assays[[assay]]@misc$scaling$vtr.biases, collapse = '_') else NULL), collapse = '_')
 }
 
 ### Reduction dimension

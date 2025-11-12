@@ -46,7 +46,18 @@ if FILERING_DOUBLET_FILTER_METHOD_NAME != "none":
             output_folder = os.path.normpath("/WORKDIR/" + "{output_filtering_dir_ge}") + "/",
             SING_FILERING_CC_SEURAT_FILE = os.path.normpath("/WORKDIR/" + FILERING_CC_SEURAT_FILE) if FILERING_CC_SEURAT_FILE != "NULL" else "NULL",
             SING_FILERING_CC_CYCLONE_FILE = os.path.normpath("/WORKDIR/" + FILERING_CC_CYCLONE_FILE) if FILERING_CC_CYCLONE_FILE != "NULL" else "NULL",
-            SING_FILERING_METADATA_FILE = ','.join([os.path.normpath("/WORKDIR/" + x) for x in FILERING_METADATA_FILE.split(',')]) if FILERING_METADATA_FILE != "NULL" else "NULL"
+            SING_FILERING_METADATA_FILE = ','.join([os.path.normpath("/WORKDIR/" + x) for x in FILERING_METADATA_FILE.split(',')]) if FILERING_METADATA_FILE != "NULL" else "NULL",
+            filtering_author_name = FILERING_AUTHOR_NAME,
+            filtering_author_mail = FILERING_AUTHOR_MAIL,
+            filtering_pcmito_min = FILERING_PCMITO_MIN,
+            filtering_pcmito_max = FILERING_PCMITO_MAX,
+            filtering_pcribo_min = FILERING_PCRIBO_MIN,
+            filtering_pcribo_max = FILERING_PC_RIBO_MAX,
+            filtering_min_features = FILERING_MIN_FEATURES,
+            filtering_min_counts = FILERING_MIN_COUNTS,
+            filtering_min_cells = FILERING_MIN_CELLS,
+            filtering_doublet_filther_method = FILERING_DOUBLET_FILTER_METHOD,
+            sing_env = SINGULARITY_ENV
         threads:
             4
         resources:
@@ -54,25 +65,25 @@ if FILERING_DOUBLET_FILTER_METHOD_NAME != "none":
             time_min = (lambda wildcards, attempt: min(attempt * 180, 1000))
         shell:
             """
-            export TMPDIR={GLOBAL_TMP}
+            export TMPDIR=$TMPDIR
             TMP_DIR=$(mktemp -d -t sc_pipeline-XXXXXXXXXX) && \
             singularity exec --no-home -B $TMP_DIR:/tmp {params.sing_bind} \
-            {SINGULARITY_ENV} \
+            {params.sing_env} \
             Rscript {params.pipeline_folder}/scripts/pipeline_part2.R \
             --input.rda.ge {params.input_rda} \
             --output.dir.ge {params.output_folder} \
-            --author.name {FILERING_AUTHOR_NAME} \
-            --author.mail {FILERING_AUTHOR_MAIL} \
+            --author.name {params.filtering_author_name} \
+            --author.mail {params.filtering_author_mail} \
             --nthreads {threads} \
             --pipeline.path {params.pipeline_folder} \
-            --pcmito.min {FILERING_PCMITO_MIN} \
-            --pcmito.max {FILERING_PCMITO_MAX} \
-            --pcribo.min {FILERING_PCRIBO_MIN} \
-            --pcribo.max {FILERING_PC_RIBO_MAX} \
-            --min.features {FILERING_MIN_FEATURES} \
-            --min.counts {FILERING_MIN_COUNTS} \
-            --min.cells {FILERING_MIN_CELLS} \
-            --doublets.filter.method {FILERING_DOUBLET_FILTER_METHOD} \
+            --pcmito.min {params.filtering_pcmito_min} \
+            --pcmito.max {params.filtering_pcmito_max} \
+            --pcribo.min {params.filtering_pcribo_min} \
+            --pcribo.max {params.filtering_pcribo_max} \
+            --min.features {params.filtering_min_features} \
+            --min.counts {params.filtering_min_counts} \
+            --min.cells {params.filtering_min_cells} \
+            --doublets.filter.method {params.filtering_doublet_filther_method} \
             --cc.seurat.file {params.SING_FILERING_CC_SEURAT_FILE} \
             --cc.cyclone.file {params.SING_FILERING_CC_CYCLONE_FILE} \
             --metadata.file {params.SING_FILERING_METADATA_FILE} && \
@@ -98,7 +109,18 @@ if FILERING_DOUBLET_FILTER_METHOD_NAME == "none":
             output_folder = os.path.normpath("/WORKDIR/" + "{output_filtering_dir_ge}") + "/",
             SING_FILERING_CC_SEURAT_FILE = os.path.normpath("/WORKDIR/" + FILERING_CC_SEURAT_FILE) if FILERING_CC_SEURAT_FILE != "NULL" else "NULL",
             SING_FILERING_CC_CYCLONE_FILE = os.path.normpath("/WORKDIR/" + FILERING_CC_CYCLONE_FILE) if FILERING_CC_CYCLONE_FILE != "NULL" else "NULL",
-            SING_FILERING_METADATA_FILE = ','.join([os.path.normpath("/WORKDIR/" + x) for x in FILERING_METADATA_FILE.split(',')]) if FILERING_METADATA_FILE != "NULL" else "NULL"
+            SING_FILERING_METADATA_FILE = ','.join([os.path.normpath("/WORKDIR/" + x) for x in FILERING_METADATA_FILE.split(',')]) if FILERING_METADATA_FILE != "NULL" else "NULL",
+            filtering_author_name = FILERING_AUTHOR_NAME,
+            filtering_author_mail = FILERING_AUTHOR_MAIL,
+            filtering_pcmito_min = FILERING_PCMITO_MIN,
+            filtering_pcmito_max = FILERING_PCMITO_MAX,
+            filtering_pcribo_min = FILERING_PCRIBO_MIN,
+            filtering_pcribo_max = FILERING_PC_RIBO_MAX,
+            filtering_min_features = FILERING_MIN_FEATURES,
+            filtering_min_counts = FILERING_MIN_COUNTS,
+            filtering_min_cells = FILERING_MIN_CELLS,
+            filtering_doublet_filther_method = FILERING_DOUBLET_FILTER_METHOD,
+            sing_env = SINGULARITY_ENV
         threads:
             4
         resources:
@@ -106,25 +128,25 @@ if FILERING_DOUBLET_FILTER_METHOD_NAME == "none":
             time_min = (lambda wildcards, attempt: min(attempt * 180, 1000))
         shell:
             """
-            export TMPDIR={GLOBAL_TMP}
+            export TMPDIR=$TMPDIR
             TMP_DIR=$(mktemp -d -t sc_pipeline-XXXXXXXXXX) && \
             singularity exec --no-home -B $TMP_DIR:/tmp {params.sing_bind} \
-            {SINGULARITY_ENV} \
+            {params.sing_env} \
             Rscript {params.pipeline_folder}/scripts/pipeline_part2.R \
             --input.rda.ge {params.input_rda} \
             --output.dir.ge {params.output_folder} \
-            --author.name {FILERING_AUTHOR_NAME} \
-            --author.mail {FILERING_AUTHOR_MAIL} \
+            --author.name {params.filtering_author_name} \
+            --author.mail {params.filtering_author_mail} \
             --nthreads {threads} \
             --pipeline.path {params.pipeline_folder} \
-            --pcmito.min {FILERING_PCMITO_MIN} \
-            --pcmito.max {FILERING_PCMITO_MAX} \
-            --pcribo.min {FILERING_PCRIBO_MIN} \
-            --pcribo.max {FILERING_PC_RIBO_MAX} \
-            --min.features {FILERING_MIN_FEATURES} \
-            --min.counts {FILERING_MIN_COUNTS} \
-            --min.cells {FILERING_MIN_CELLS} \
-            --doublets.filter.method {FILERING_DOUBLET_FILTER_METHOD} \
+            --pcmito.min {params.filtering_pcmito_min} \
+            --pcmito.max {params.filtering_pcmito_max} \
+            --pcribo.min {params.filtering_pcribo_min} \
+            --pcribo.max {params.filtering_pcribo_max} \
+            --min.features {params.filtering_min_features} \
+            --min.counts {params.filtering_min_counts} \
+            --min.cells {params.filtering_min_cells} \
+            --doublets.filter.method {params.filtering_doublet_filther_method} \
             --cc.seurat.file {params.SING_FILERING_CC_SEURAT_FILE} \
             --cc.cyclone.file {params.SING_FILERING_CC_CYCLONE_FILE} \
             --metadata.file {params.SING_FILERING_METADATA_FILE} && \

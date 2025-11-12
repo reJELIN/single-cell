@@ -38,7 +38,19 @@ rule cerebro:
         pipeline_folder = os.path.normpath("/WORKDIR/" + PIPELINE_FOLDER),
         input_rda = lambda wildcards, input: os.path.normpath("/WORKDIR/" + input[0]),
         SING_CEREBRO_GMT_FILE = os.path.normpath("/WORKDIR/" + CEREBRO_GMT_FILE) if CEREBRO_GMT_FILE != "NULL" else "NULL",
-        SING_CEREBRO_METADATA_FILE = ','.join([os.path.normpath("/WORKDIR/" + x) for x in CEREBRO_METADATA_FILE.split(',')]) if CEREBRO_METADATA_FILE != "NULL" else "NULL"
+        SING_CEREBRO_METADATA_FILE = ','.join([os.path.normpath("/WORKDIR/" + x) for x in CEREBRO_METADATA_FILE.split(',')]) if CEREBRO_METADATA_FILE != "NULL" else "NULL",
+        cerebro_author_name = CEREBRO_AUTHOR_NAME,
+        cerebro_author_mail = CEREBRO_AUTHOR_MAIL,
+        cerebro_version = CEREBRO_VERSION,
+        cerebro_groups = CEREBRO_GROUPS,
+        cerebro_remove_other_red = CEREBRO_REMOVE_OTHER_RED,
+        cerebro_remove_other_ident = CEREBRO_REMOVE_OTHER_IDENT,
+        cerebro_remove_mt = CEREBRO_REMOVE_MT,
+        cerebro_remove_crb = CEREBRO_REMOVE_CRB,
+        cerebro_remove_str = CEREBRO_REMOVE_STR,
+        cerebro_only_pos_de = CEREBRO_ONLY_POS_DE,
+        cerebro_remove_custom_de = CEREBRO_REMOVE_CUSTOM_DE
+        singularity_env_cerebro = SINGULARITY_ENV_CEREBRO
     threads:
         1
     resources:
@@ -49,22 +61,22 @@ rule cerebro:
         export TMPDIR={GLOBAL_TMP}
         TMP_DIR=$(mktemp -d -t sc_pipeline-XXXXXXXXXX) && \
         singularity exec --contain --home $TMP_DIR:$HOME -B $TMP_DIR:/tmp {params.sing_bind} \
-        {SINGULARITY_ENV_CEREBRO} \
+        {params.singularity_env_cerebro} \
         Rscript {params.pipeline_folder}/scripts/pipeline_CEREBRO.R \
         --input.rda.ge {params.input_rda} \
-        --author.name {CEREBRO_AUTHOR_NAME} \
-        --author.mail {CEREBRO_AUTHOR_MAIL} \
+        --author.name {params.cerebro_author_name} \
+        --author.mail {params.cerebro_author_mail} \
         --nthreads {threads} \
         --pipeline.path {params.pipeline_folder} \
-        --version {CEREBRO_VERSION} \
-        --groups {CEREBRO_GROUPS} \
-        --remove.other.reductions {CEREBRO_REMOVE_OTHER_RED} \
-        --remove.other.idents {CEREBRO_REMOVE_OTHER_IDENT} \
-        --remove.mt.genes {CEREBRO_REMOVE_MT} \
-        --remove.crb.genes {CEREBRO_REMOVE_CRB} \
-        --remove.str.genes {CEREBRO_REMOVE_STR} \
-        --only.pos.DE {CEREBRO_ONLY_POS_DE} \
-        --remove.custom.DE {CEREBRO_REMOVE_CUSTOM_DE} \
+        --version {params.cerebro_version} \
+        --groups {params.cerebro_groups} \
+        --remove.other.reductions {params.cerebro_remove_other_red} \
+        --remove.other.idents {params.cerebro_remove_other_ident} \
+        --remove.mt.genes {params.cerebro_remove_mt} \
+        --remove.crb.genes {params.cerebro_remove_crb} \
+        --remove.str.genes {params.cerebro_remove_str} \
+        --only.pos.DE {params.cerebro_only_pos_de} \
+        --remove.custom.DE {params.cerebro_remove_custom_de} \
         --gmt.file {params.SING_CEREBRO_GMT_FILE} \
         --metadata.file {params.SING_CEREBRO_METADATA_FILE}
         """

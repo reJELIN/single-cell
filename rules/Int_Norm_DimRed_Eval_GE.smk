@@ -42,7 +42,25 @@ rule int_norm_dimred_ge:
         pipeline_folder = os.path.normpath("/WORKDIR/" + PIPELINE_FOLDER),
         int_input_rda = int_norm_dimred_input_ge_R,
         int_output_folder = os.path.normpath("/WORKDIR/" + "{output_int_norm_dimred_dir_ge}") + "/",
-        SING_INT_NDRE_METADATA_FILE = ','.join([os.path.normpath("/WORKDIR/" + x) for x in INT_NDRE_METADATA_FILE.split(',')]) if INT_NDRE_METADATA_FILE != "NULL" else "NULL"
+        SING_INT_NDRE_METADATA_FILE = ','.join([os.path.normpath("/WORKDIR/" + x) for x in INT_NDRE_METADATA_FILE.split(',')]) if INT_NDRE_METADATA_FILE != "NULL" else "NULL",
+        INT_SINGULARITY_ENV = INT_SINGULARITY_ENV,
+        INT_NDRE_AUTHOR_NAME = INT_NDRE_AUTHOR_NAME,
+        INT_NDRE_AUTHOR_MAIL = INT_NDRE_AUTHOR_MAIL,
+        INT_NDRE_EVAL_MARKERS = INT_NDRE_EVAL_MARKERS,
+        INT_NDRE_MIN_CELLS = INT_NDRE_MIN_CELLS,
+        INT_NDRE_INT_METHOD = INT_NDRE_INT_METHOD,
+        INT_NDRE_VTR_BATCH = INT_NDRE_VTR_BATCH,
+        INT_NDRE_FEATURES_N = INT_NDRE_FEATURES_N,
+        INT_NDRE_NORM_METHOD = INT_NDRE_NORM_METHOD,
+        INT_NDRE_DIMRED_METHOD = INT_NDRE_DIMRED_METHOD,
+        INT_NDRE_VTR_BIASES = INT_NDRE_VTR_BIASES,
+        INT_NDRE_VTR_SCALE = INT_NDRE_VTR_SCALE,
+        INT_NDRE_DIM_MAX = INT_NDRE_DIM_MAX,
+        INT_NDRE_DIM_MIN = INT_NDRE_DIM_MIN,
+        INT_NDRE_DIM_STEPS = INT_NDRE_DIM_STEPS,
+        INT_NDRE_RES_MAX = INT_NDRE_RES_MAX,
+        INT_NDRE_RES_MIN = INT_NDRE_RES_MIN,
+        INT_NDRE_RES_STEPS = INT_NDRE_RES_STEPS
     threads:
         4
     resources:
@@ -50,7 +68,7 @@ rule int_norm_dimred_ge:
         time_min = (lambda wildcards, attempt: min(60 * len(dic_INT_NDRE_INFO[wildcards.name_int]['INT_NDRE_INPUT_LIST_RDA'].split(',')) + attempt * 120, 4320))
     shell:
         """
-        export TMPDIR={GLOBAL_TMP}
+        export TMPDIR=$TMPDIR
         TMP_DIR=$(mktemp -d -t sc_pipeline-XXXXXXXXXX) && \
         singularity exec --no-home -B $TMP_DIR:/tmp {params.sing_int_bind} \
         {INT_SINGULARITY_ENV} \
@@ -58,25 +76,25 @@ rule int_norm_dimred_ge:
         --input.list.rda {params.int_input_rda} \
         --output.dir.int {params.int_output_folder} \
         --name.int {wildcards.name_int} \
-        --author.name {INT_NDRE_AUTHOR_NAME} \
-        --author.mail {INT_NDRE_AUTHOR_MAIL} \
+        --author.name {params.INT_NDRE_AUTHOR_NAME} \
+        --author.mail {params.INT_NDRE_AUTHOR_MAIL} \
         --nthreads {threads} \
         --pipeline.path {params.pipeline_folder} \
-        --eval.markers {INT_NDRE_EVAL_MARKERS} \
-        --min.cells {INT_NDRE_MIN_CELLS} \
-        --integration.method {INT_NDRE_INT_METHOD}  \
-        --vtr.batch {INT_NDRE_VTR_BATCH} \
-        --features.n {INT_NDRE_FEATURES_N} \
-        --norm.method {INT_NDRE_NORM_METHOD} \
-        --dimred.method {INT_NDRE_DIMRED_METHOD} \
-        --vtr.biases {INT_NDRE_VTR_BIASES} \
-        --vtr.scale {INT_NDRE_VTR_SCALE} \
-        --dims.max {INT_NDRE_DIM_MAX} \
-        --dims.min {INT_NDRE_DIM_MIN} \
-        --dims.steps {INT_NDRE_DIM_STEPS} \
-        --res.max {INT_NDRE_RES_MAX} \
-        --res.min {INT_NDRE_RES_MIN} \
-        --res.steps {INT_NDRE_RES_STEPS} \
+        --eval.markers {params.INT_NDRE_EVAL_MARKERS} \
+        --min.cells {params.INT_NDRE_MIN_CELLS} \
+        --integration.method {params.INT_NDRE_INT_METHOD}  \
+        --vtr.batch {params.INT_NDRE_VTR_BATCH} \
+        --features.n {params.INT_NDRE_FEATURES_N} \
+        --norm.method {params.INT_NDRE_NORM_METHOD} \
+        --dimred.method {params.INT_NDRE_DIMRED_METHOD} \
+        --vtr.biases {params.INT_NDRE_VTR_BIASES} \
+        --vtr.scale {params.INT_NDRE_VTR_SCALE} \
+        --dims.max {params.INT_NDRE_DIM_MAX} \
+        --dims.min {params.INT_NDRE_DIM_MIN} \
+        --dims.steps {params.INT_NDRE_DIM_STEPS} \
+        --res.max {params.INT_NDRE_RES_MAX} \
+        --res.min {params.INT_NDRE_RES_MIN} \
+        --res.steps {params.INT_NDRE_RES_STEPS} \
         --metadata.file {params.SING_INT_NDRE_METADATA_FILE} && \
         rm -r $TMP_DIR || rm -r $TMP_DIR
         """

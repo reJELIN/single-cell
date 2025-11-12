@@ -42,7 +42,24 @@ rule grp_norm_dimred_ge:
         pipeline_folder = os.path.normpath("/WORKDIR/" + PIPELINE_FOLDER),
         grp_input_rda = grp_norm_dimred_input_ge_R,
         grp_output_folder = os.path.normpath("/WORKDIR/" + "{output_grp_norm_dimred_dir_ge}") + "/",
-        SING_GRP_NDRE_METADATA_FILE = ','.join([os.path.normpath("/WORKDIR/" + x) for x in GRP_NDRE_METADATA_FILE.split(',')]) if GRP_NDRE_METADATA_FILE != "NULL" else "NULL"
+        SING_GRP_NDRE_METADATA_FILE = ','.join([os.path.normpath("/WORKDIR/" + x) for x in GRP_NDRE_METADATA_FILE.split(',')]) if GRP_NDRE_METADATA_FILE != "NULL" else "NULL",
+        SINGULARITY_ENV = SINGULARITY_ENV,
+        GRP_NDRE_AUTHOR_NAME = GRP_NDRE_AUTHOR_NAME,
+        GRP_NDRE_AUTHOR_MAIL = GRP_NDRE_AUTHOR_MAIL,
+        GRP_NDRE_EVAL_MARKERS = GRP_NDRE_EVAL_MARKERS,
+        GRP_NDRE_MIN_CELLS = GRP_NDRE_MIN_CELLS,
+        GRP_NDRE_KEEP_NORM = GRP_NDRE_KEEP_NORM,
+        GRP_NDRE_FEATURES_N = GRP_NDRE_FEATURES_N,
+        GRP_NDRE_NORM_METHOD = GRP_NDRE_NORM_METHOD,
+        GRP_NDRE_DIMRED_METHOD = GRP_NDRE_DIMRED_METHOD,
+        GRP_NDRE_VTR_BIASES = GRP_NDRE_VTR_BIASES,
+        GRP_NDRE_VTR_SCALE = GRP_NDRE_VTR_SCALE,
+        GRP_NDRE_DIM_MAX = GRP_NDRE_DIM_MAX,
+        GRP_NDRE_DIM_MIN = GRP_NDRE_DIM_MIN,
+        GRP_NDRE_DIM_STEPS = GRP_NDRE_DIM_STEPS,
+        GRP_NDRE_RES_MAX = GRP_NDRE_RES_MAX,
+        GRP_NDRE_RES_MIN = GRP_NDRE_RES_MIN,
+        GRP_NDRE_RES_STEPS = GRP_NDRE_RES_STEPS
     threads:
         4
     resources:
@@ -50,32 +67,32 @@ rule grp_norm_dimred_ge:
         time_min = (lambda wildcards, attempt: min(60 * len(dic_GRP_NDRE_INFO[wildcards.name_grp]['GRP_NDRE_INPUT_LIST_RDA'].split(',')) + attempt * 120, 4320))
     shell:
         """
-        export TMPDIR={GLOBAL_TMP}
+        export TMPDIR=$TMPDIR
         TMP_DIR=$(mktemp -d -t sc_pipeline-XXXXXXXXXX) && \
         singularity exec --no-home -B $TMP_DIR:/tmp {params.sing_grp_bind} \
-        {SINGULARITY_ENV} \
+        {params.SINGULARITY_ENV} \
         Rscript {params.pipeline_folder}/scripts/Grouped_analysis_part1.R \
         --input.list.rda {params.grp_input_rda} \
         --output.dir.grp {params.grp_output_folder} \
         --name.grp {wildcards.name_grp} \
-        --author.name {GRP_NDRE_AUTHOR_NAME} \
-        --author.mail {GRP_NDRE_AUTHOR_MAIL} \
+        --author.name {params.GRP_NDRE_AUTHOR_NAME} \
+        --author.mail {params.GRP_NDRE_AUTHOR_MAIL} \
         --nthreads {threads} \
         --pipeline.path {params.pipeline_folder} \
-        --eval.markers {GRP_NDRE_EVAL_MARKERS} \
-        --min.cells {GRP_NDRE_MIN_CELLS} \
-        --keep.norm {GRP_NDRE_KEEP_NORM}  \
-        --features.n {GRP_NDRE_FEATURES_N} \
-        --norm.method {GRP_NDRE_NORM_METHOD} \
-        --dimred.method {GRP_NDRE_DIMRED_METHOD} \
-        --vtr.biases {GRP_NDRE_VTR_BIASES} \
-        --vtr.scale {GRP_NDRE_VTR_SCALE} \
-        --dims.max {GRP_NDRE_DIM_MAX} \
-        --dims.min {GRP_NDRE_DIM_MIN} \
-        --dims.steps {GRP_NDRE_DIM_STEPS} \
-        --res.max {GRP_NDRE_RES_MAX} \
-        --res.min {GRP_NDRE_RES_MIN} \
-        --res.steps {GRP_NDRE_RES_STEPS} \
+        --eval.markers {params.GRP_NDRE_EVAL_MARKERS} \
+        --min.cells {params.GRP_NDRE_MIN_CELLS} \
+        --keep.norm {params.GRP_NDRE_KEEP_NORM}  \
+        --features.n {params.GRP_NDRE_FEATURES_N} \
+        --norm.method {params.GRP_NDRE_NORM_METHOD} \
+        --dimred.method {params.GRP_NDRE_DIMRED_METHOD} \
+        --vtr.biases {params.GRP_NDRE_VTR_BIASES} \
+        --vtr.scale {params.GRP_NDRE_VTR_SCALE} \
+        --dims.max {params.GRP_NDRE_DIM_MAX} \
+        --dims.min {params.GRP_NDRE_DIM_MIN} \
+        --dims.steps {params.GRP_NDRE_DIM_STEPS} \
+        --res.max {params.GRP_NDRE_RES_MAX} \
+        --res.min {params.GRP_NDRE_RES_MIN} \
+        --res.steps {params.GRP_NDRE_RES_STEPS} \
         --metadata.file {params.SING_GRP_NDRE_METADATA_FILE} && \
         rm -r $TMP_DIR || rm -r $TMP_DIR
         """
