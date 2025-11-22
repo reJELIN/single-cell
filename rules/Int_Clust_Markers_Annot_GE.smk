@@ -45,7 +45,7 @@ rule int_clust_markers_annot_ge:
     input:
         int_cma_file = int_clust_markers_annot_input_ge
     output:
-        int_cma_rda_file = os.path.normpath("{output_int_clust_markers_annot_dir_ge}" + "/" + INT_CMA_CLUST_FOLDER + "/" + "{name_int}" + "{int_complement}" + str(INT_CMA_KEEP_DIM) + "_" + str(INT_CMA_KEEP_RES) + ".rda")
+        int_cma_rda_file = os.path.normpath("{output_int_clust_markers_annot_dir_ge}" + "/" + INT_CMA_CLUST_FOLDER + "/" + "{name_int}" + "{int_complement}_" + str(INT_CMA_KEEP_DIM) + "_" + str(INT_CMA_KEEP_RES) + ".rda")
     params:
         sing_int_bind = int_clust_markers_annot_params_sing,
         pipeline_folder = os.path.normpath("/WORKDIR/" + PIPELINE_FOLDER),

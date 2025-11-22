@@ -71,7 +71,7 @@ rule int_norm_dimred_ge:
         export TMPDIR=$TMPDIR
         TMP_DIR=$(mktemp -d -t sc_pipeline-XXXXXXXXXX) && \
         singularity exec --no-home -B $TMP_DIR:/tmp {params.sing_int_bind} \
-        {INT_SINGULARITY_ENV} \
+        {params.INT_SINGULARITY_ENV} \
         Rscript {params.pipeline_folder}/scripts/Integration_part1.R \
         --input.list.rda {params.int_input_rda} \
         --output.dir.int {params.int_output_folder} \

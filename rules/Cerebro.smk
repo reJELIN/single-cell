@@ -49,7 +49,7 @@ rule cerebro:
         cerebro_remove_crb = CEREBRO_REMOVE_CRB,
         cerebro_remove_str = CEREBRO_REMOVE_STR,
         cerebro_only_pos_de = CEREBRO_ONLY_POS_DE,
-        cerebro_remove_custom_de = CEREBRO_REMOVE_CUSTOM_DE
+        cerebro_remove_custom_de = CEREBRO_REMOVE_CUSTOM_DE,
         singularity_env_cerebro = SINGULARITY_ENV_CEREBRO
     threads:
         1
