@@ -67,6 +67,8 @@ rule clust_markers_annot_ge:
     resources:
         mem_mb = lambda wildcards, attempt: 10240 + attempt * 5120,
         time_min = lambda wildcards, attempt: attempt * 120
+    envmodules:
+        "singularity-ce/4.2.2"
     shell:
         """
         export TMPDIR=$TMPDIR

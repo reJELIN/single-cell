@@ -82,6 +82,8 @@ rule QC_droplets_ge:
         qc_min_counts = QC_MIN_COUNTS,
         qc_min_cells = QC_MIN_CELLS,
         sing_env = SINGULARITY_ENV
+    envmodules:
+        "singularity-ce/4.2.2"
     threads:
         2
     resources:

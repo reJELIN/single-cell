@@ -60,6 +60,8 @@ if FILERING_DOUBLET_FILTER_METHOD_NAME != "none":
             sing_env = SINGULARITY_ENV
         threads:
             4
+        envmodules:
+            "singularity-ce/4.2.2"
         resources:
             mem_mb = (lambda wildcards, attempt: min(5121 + attempt * 5121, 51200)),
             time_min = (lambda wildcards, attempt: min(attempt * 180, 1000))

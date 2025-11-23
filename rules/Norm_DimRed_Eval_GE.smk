@@ -57,6 +57,8 @@ rule norm_dimred_ge:
     resources:
         mem_mb = (lambda wildcards, attempt: min(5120 + attempt * 5120, 61440)),
         time_min = (lambda wildcards, attempt: min(attempt * 120, 200))
+    envmodules:
+        "singularity-ce/4.2.2"
     shell:
         """
         export TMPDIR=$TMPDIR
