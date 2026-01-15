@@ -41,10 +41,10 @@ def get_targets(STEPS):
         ]
     if "Droplets_QC_GE" in STEPS:
         targets["Droplets_QC_GE"]=[
-        expand(os.path.normpath("{outputqc_droplets_dir_ge}" + "/QC_droplets/" + "{sample_name_ge}_kneeplot.png"), zip, outputqc_droplets_dir_ge=QC_OUTPUT_DIR_GE, sample_name_ge=QC_SAMPLE_NAME_GE) if  str(QC_EMPTYDROPS_RETAIN) == "NULL" else expand(os.path.normpath("{outputqc_droplets_dir_ge}" + "/QC_droplets_retain" + str(QC_EMPTYDROPS_RETAIN) + "/{sample_name_ge}_kneeplot.png"), zip, outputqc_droplets_dir_ge=QC_OUTPUT_DIR_GE, sample_name_ge=QC_SAMPLE_NAME_GE),
-        expand(os.path.normpath("{outputqc_droplets_dir_ge}" + "/QC_droplets/" + "{sample_name_ge}_saturation_plot.png"), zip, outputqc_droplets_dir_ge=QC_OUTPUT_DIR_GE, sample_name_ge=QC_SAMPLE_NAME_GE) if  str(QC_EMPTYDROPS_RETAIN) == "NULL" else expand(os.path.normpath("{outputqc_droplets_dir_ge}" + "/QC_droplets_retain" + str(QC_EMPTYDROPS_RETAIN) + "/{sample_name_ge}_saturation_plot.png"), zip, outputqc_droplets_dir_ge=QC_OUTPUT_DIR_GE, sample_name_ge=QC_SAMPLE_NAME_GE),
-        expand(os.path.normpath("{outputqc_droplets_dir_ge}" + "/QC_droplets/" + "{sample_name_ge}_QChist.png"), zip, outputqc_droplets_dir_ge=QC_OUTPUT_DIR_GE, sample_name_ge=QC_SAMPLE_NAME_GE) if  str(QC_EMPTYDROPS_RETAIN) == "NULL" else expand(os.path.normpath("{outputqc_droplets_dir_ge}" + "/QC_droplets_retain" + str(QC_EMPTYDROPS_RETAIN) + "/{sample_name_ge}_QChist.png"), zip, outputqc_droplets_dir_ge=QC_OUTPUT_DIR_GE, sample_name_ge=QC_SAMPLE_NAME_GE),
-        expand(os.path.normpath("{outputqc_droplets_dir_ge}" + "/QC_droplets/" + "{sample_name_ge}_QC_NON-NORMALIZED.rda"), zip, outputqc_droplets_dir_ge=QC_OUTPUT_DIR_GE, sample_name_ge=QC_SAMPLE_NAME_GE) if  str(QC_EMPTYDROPS_RETAIN) == "NULL" else expand(os.path.normpath("{outputqc_droplets_dir_ge}" + "/QC_droplets_retain" + str(QC_EMPTYDROPS_RETAIN) + "/{sample_name_ge}_QC_NON-NORMALIZED.rda"), zip, outputqc_droplets_dir_ge=QC_OUTPUT_DIR_GE, sample_name_ge=QC_SAMPLE_NAME_GE)
+        expand(os.path.normpath("{outputqc_droplets_dir_ge}/QC_droplets/{sample_name_ge}_kneeplot.png"), zip, outputqc_droplets_dir_ge=QC_OUTPUT_DIR_GE, sample_name_ge=QC_SAMPLE_NAME_GE) if  str(QC_EMPTYDROPS_RETAIN) == "NULL" else expand(os.path.normpath("{outputqc_droplets_dir_ge}" + "/QC_droplets_retain" + str(QC_EMPTYDROPS_RETAIN) + "/{sample_name_ge}_kneeplot.png"), zip, outputqc_droplets_dir_ge=QC_OUTPUT_DIR_GE, sample_name_ge=QC_SAMPLE_NAME_GE),
+        expand(os.path.normpath("{outputqc_droplets_dir_ge}/QC_droplets/{sample_name_ge}_saturation_plot.png"), zip, outputqc_droplets_dir_ge=QC_OUTPUT_DIR_GE, sample_name_ge=QC_SAMPLE_NAME_GE) if  str(QC_EMPTYDROPS_RETAIN) == "NULL" else expand(os.path.normpath("{outputqc_droplets_dir_ge}" + "/QC_droplets_retain" + str(QC_EMPTYDROPS_RETAIN) + "/{sample_name_ge}_saturation_plot.png"), zip, outputqc_droplets_dir_ge=QC_OUTPUT_DIR_GE, sample_name_ge=QC_SAMPLE_NAME_GE),
+        expand(os.path.normpath("{outputqc_droplets_dir_ge}/QC_droplets/{sample_name_ge}_QChist.png"), zip, outputqc_droplets_dir_ge=QC_OUTPUT_DIR_GE, sample_name_ge=QC_SAMPLE_NAME_GE) if  str(QC_EMPTYDROPS_RETAIN) == "NULL" else expand(os.path.normpath("{outputqc_droplets_dir_ge}" + "/QC_droplets_retain" + str(QC_EMPTYDROPS_RETAIN) + "/{sample_name_ge}_QChist.png"), zip, outputqc_droplets_dir_ge=QC_OUTPUT_DIR_GE, sample_name_ge=QC_SAMPLE_NAME_GE),
+        expand(os.path.normpath("{outputqc_droplets_dir_ge}/QC_droplets/{sample_name_ge}_QC_NON-NORMALIZED.rda"), zip, outputqc_droplets_dir_ge=QC_OUTPUT_DIR_GE, sample_name_ge=QC_SAMPLE_NAME_GE) if  str(QC_EMPTYDROPS_RETAIN) == "NULL" else expand(os.path.normpath("{outputqc_droplets_dir_ge}" + "/QC_droplets_retain" + str(QC_EMPTYDROPS_RETAIN) + "/{sample_name_ge}_QC_NON-NORMALIZED.rda"), zip, outputqc_droplets_dir_ge=QC_OUTPUT_DIR_GE, sample_name_ge=QC_SAMPLE_NAME_GE)
         ]
     if "Filtering_GE" in STEPS:
         targets["Filtering_GE"]=[
@@ -121,58 +121,6 @@ def get_targets(STEPS):
     if "Grp_Adding_BCR" in STEPS:
         targets["Grp_Adding_BCR"]=[
         expand("{grp_add_bcr_output}_BCR.rda", grp_add_bcr_output = GRP_ADD_BCR_OUTPUT)
-        ]
-    if "Alignment_countTable_LR_GE" in STEPS:
-        targets["Alignment_countTable_LR_GE"]=[
-        expand(ALIGN_OUTPUT_DIR_GE+"/samplesheet/{sample_name_ge}_samplesheet.csv",sample_name_ge=ALIGN_SAMPLE_NAME),
-        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}_GE/{sample_name_ge}_GE/{sample_name_ge}_GE.gene_raw_feature_bc_matrix/matrix.mtx.gz",sample_name_ge=ALIGN_SAMPLE_NAME),
-        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}_GE/{sample_name_ge}_GE/{sample_name_ge}_GE.transcript_raw_feature_bc_matrix/matrix.mtx.gz",sample_name_ge=ALIGN_SAMPLE_NAME),
-        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}_GE/{sample_name_ge}_GE/{sample_name_ge}_GE.tagged.bam",sample_name_ge=ALIGN_SAMPLE_NAME)
-        ]
-    if "Isoform_Markers_GE" in STEPS:
-        targets["Isoform_Markers_GE"]=[
-        #expand("{start}/{sample_name_ge}{end}",zip,start=COMPLEMENT_ISOFORM_OUTPUT_RDA_LIST_START,sample_name_ge=ISOFORM_SAMPLE_NAME_GE,end=COMPLEMENT_ISOFORM_OUTPUT_RDA_LIST_END)
-        expand(ISFORM_MTX_INTPUT[0]+"{sample_name_ge}/{sample_name_ge}/{sample_name_ge}_"+CMA_CLUST_FOLDER+"_sobj_isoform.rda",sample_name_ge=ISOFORM_SAMPLE_NAME_GE)
-        ]
-    if "Variants_Markers_GE" in STEPS:
-        if split_chrom_only:
-            targets["Variants_Markers_GE"]=[
-            expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/split_chrom/tagged_sort_"+chr_list[0]+".bam",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
-            expand(ALIGN_OUTPUT_DIR_GE+ "/{sample_name_ge}/" + FILTERS_FOLDER + "/DOUBLETSFILTER_all/{sample_name_ge}_FILTERED_barcodes.txt",sample_name_ge=ALIGN_SAMPLE_NAME_GE)
-            ]
-        else:
-            targets["Variants_Markers_GE"]=[
-            expand(ALIGN_OUTPUT_DIR_GE+ "/{sample_name_ge}/" + FILTERS_FOLDER + "/DOUBLETSFILTER_all/{sample_name_ge}_FILTERED_barcodes.txt",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
-            expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/split_chrom/tagged_sort_"+chr_list[0]+".bam",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
-            expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/barcodes_batch/{sample_name_ge}_barcodes_list_{batch_number}.txt",sample_name_ge=ALIGN_SAMPLE_NAME_GE,batch_number=batch_number_seq),
-            expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/tmp/end_of_split_bam_per_bc.DONE",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
-            expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/tmp_mpileup/DONE_{sample_name_ge}_barcodes_list_{batch_number}.txt",sample_name_ge=ALIGN_SAMPLE_NAME_GE,batch_number=batch_number_seq),
-            expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/matrix_SNP_{sample_name_ge}.tsv",sample_name_ge=ALIGN_SAMPLE_NAME_GE,batch_number=batch_number_seq)
-            ]
-    if "Variants_Calling_GE" in STEPS:
-        targets["Variants_Calling_GE"]=[
-        expand(ALIGN_OUTPUT_DIR_GE+ "/{sample_name_ge}/" + FILTERS_FOLDER + "/DOUBLETSFILTER_all/{sample_name_ge}_FILTERED_barcodes.txt",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
-        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/filtered_tagged.bam",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
-        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/filtered_sort_tagged.bam",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
-        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/{sample_name_ge}_longshot.vcf",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
-        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/{sample_name_ge}_longshot.vcf.gz",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
-        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/{sample_name_ge}_longshot_filtered.vcf.gz",sample_name_ge=ALIGN_SAMPLE_NAME_GE),
-        expand(ALIGN_OUTPUT_DIR_GE+"/{sample_name_ge}/{sample_name_ge}/{sample_name_ge}_longshot_filtered.vcf.gz.tbi",sample_name_ge=ALIGN_SAMPLE_NAME_GE)
-        ]
-    if "Int_Isoform_Markers" in STEPS:
-        targets["Int_Isoform_Markers"]=[expand(INT_ISOFORM_OUPUT_DIR_GLOBAL+"GROUPED_ANALYSIS/INTEGRATED/{sample_int}/tmp/DONE_int_isoform_markers_"+INT_CMA_CLUST_FOLDER+".txt",sample_int=INT_ISOFORM_SAMPLE)]
-        
-    if "Grp_Isoform_Markers" in STEPS:
-        targets["Grp_Isoform_Markers"]=[expand(GRP_ISOFORM_OUPUT_DIR_GLOBAL+"GROUPED_ANALYSIS/NO_INTEGRATED/{sample_grp}/tmp/DONE__grp_isoform_markers_"+GRP_CMA_CLUST_FOLDER+".txt",sample_grp=GRP_ISOFORM_SAMPLE)]
-        
-    if "Variants_Calling_Comparison_GE" in STEPS:
-        targets["Variants_Calling_Comparison_GE"]=[
-        expand(ouput_dir_ge+"{sample_name_ge}/{sample_name_ge}/SNV_COMPARE/barcodes_ctrl.txt",sample_name_ge=sample_ge_list),
-        expand(ouput_dir_ge+"{sample_name_ge}/{sample_name_ge}/SNV_COMPARE/barcodes_ofint.txt",sample_name_ge=sample_ge_list),
-        expand(ouput_dir_ge+"{sample_name_ge}/{sample_name_ge}/SNV_COMPARE/bam/{statut}/filtered_{statut}.bam",sample_name_ge=sample_ge_list,statut=["ctrl","to_test"]),
-        expand(ouput_dir_ge+"{sample_name_ge}/{sample_name_ge}/SNV_COMPARE/vcf/{statut}/filtered_{statut}.vcf",sample_name_ge=sample_ge_list,statut=["ctrl","to_test"]),
-        expand(vcf_out=ouput_dir_ge+"{sample_name_ge}/{sample_name_ge}/SNV_COMPARE/vcf/{statut}/filtered_{statut}.vcf.gz",sample_name_ge=sample_ge_list,statut=["ctrl","to_test"]),
-        expand(ouput_dir_ge+"{sample_name_ge}/{sample_name_ge}/SNV_COMPARE/isec/README.txt",sample_name_ge=sample_ge_list)
         ]
         
     return targets

@@ -58,7 +58,7 @@ rule cerebro:
         time_min = (lambda wildcards, attempt: min(attempt * 60, 200))
     shell:
         """
-        export TMPDIR={GLOBAL_TMP}
+        export TMPDIR=$TMPDIR
         TMP_DIR=$(mktemp -d -t sc_pipeline-XXXXXXXXXX) && \
         singularity exec --contain --home $TMP_DIR:$HOME -B $TMP_DIR:/tmp {params.sing_bind} \
         {params.singularity_env_cerebro} \

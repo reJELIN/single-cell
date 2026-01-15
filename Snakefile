@@ -204,57 +204,82 @@ if "Alignment_countTable_GE" in STEPS or "Alignment_countTable_ADT" in STEPS or 
 
 if "Droplets_QC_GE" in STEPS:
     ### Sample/Project
-    if 'Droplets_QC_GE' in config:
-        if 'sample.name.ge' in config['Droplets_QC_GE']:
-            QC_SAMPLE_NAME_GE_RAW = config['Droplets_QC_GE']['sample.name.ge']
-            QC_SAMPLE_NAME_GE = []
-            for i in range(0, len(QC_SAMPLE_NAME_GE_RAW), 1):
-                if not QC_SAMPLE_NAME_GE_RAW[i].endswith("_GE"):
-                    QC_SAMPLE_NAME_GE.append(QC_SAMPLE_NAME_GE_RAW[i] + "_GE")
-                else:
-                    QC_SAMPLE_NAME_GE.append(QC_SAMPLE_NAME_GE_RAW[i])
-            ALIGN_SAMPLE_NAME_GE = QC_SAMPLE_NAME_GE
-        if 'input.dir.ge' in config['Droplets_QC_GE']:
-            QC_INPUT_DIR_GE = config['Droplets_QC_GE']['input.dir.ge']
-
-        elif "Alignment_countTable_GE" in config and "output.dir.ge" in config['Alignment_countTable_GE']:
-            ALIGN_OUTPUT_DIR_GE = config['Alignment_countTable_GE']["output.dir.ge"]
-            if all(os.path.isdir(f) for f in [os.path.normpath(f"{ALIGN_OUTPUT_DIR_GE}/{x}/{x}/{x}.gene_raw_feature_bc_matrix/") for x in QC_SAMPLE_NAME_GE]):
-                QC_INPUT_DIR_GE = [os.path.normpath(f"{ALIGN_OUTPUT_DIR_GE}/{x}/{x}/{x}.gene_raw_feature_bc_matrix/")for x in QC_SAMPLE_NAME_GE]
-
-    elif (
-        'sample.name.ge' in config['Alignment_countTable_GE']
-        and 'input.dir.ge' in config['Alignment_countTable_GE']
-        and "Alignment_countTable_GE" in STEPS
-    ):
-        sys.stderr.write(
-            "Note: No sample.name.ge or input.dir.ge found in Droplets_QC_GE section of configfile; "
-            "sample.name.ge and input.dir.ge will be determined from Alignment_countTable_GE step for Droplets_QC_GE step!\n"
-        )
-
+    if 'Droplets_QC_GE' in config and 'sample.name.ge' in config['Droplets_QC_GE'] and 'input.dir.ge' not in config['Droplets_QC_GE'] and "output.dir.ge" in config["Alignment_countTable_GE"]:
+        QC_SAMPLE_NAME_GE_RAW = config['Droplets_QC_GE']['sample.name.ge']
+        QC_SAMPLE_NAME_GE = []
+        for i in range(0,len(QC_SAMPLE_NAME_GE_RAW),1):
+            QC_SAMPLE_NAME_GE.append(QC_SAMPLE_NAME_GE_RAW[i] + "_GE") if (QC_SAMPLE_NAME_GE_RAW[i][len(QC_SAMPLE_NAME_GE_RAW[i])-3:] != "_GE") else QC_SAMPLE_NAME_GE.append(QC_SAMPLE_NAME_GE_RAW[i])
+        ALIGN_OUTPUT_DIR_GE = os.path.normpath(config['Alignment_countTable_GE']['output.dir.ge'])
+        QC_INPUT_DIR_GE = [os.path.join(f"{ALIGN_OUTPUT_DIR_GE}/{x}/{x}/{x}.gene_raw_feature_bc_matrix") for x in QC_SAMPLE_NAME_GE]
+    elif 'Droplets_QC_GE' in config and 'sample.name.ge' in config['Droplets_QC_GE'] and 'input.dir.ge' in config['Droplets_QC_GE']:
+        QC_SAMPLE_NAME_GE_RAW = config['Droplets_QC_GE']['sample.name.ge']
+        QC_INPUT_DIR_GE = config['Droplets_QC_GE']['input.dir.ge']
+        #check samples names and add "_GE" if needed
+        QC_SAMPLE_NAME_GE = []
+        for i in range(0,len(QC_SAMPLE_NAME_GE_RAW),1):
+            QC_SAMPLE_NAME_GE.append(QC_SAMPLE_NAME_GE_RAW[i] + "_GE") if (QC_SAMPLE_NAME_GE_RAW[i][len(QC_SAMPLE_NAME_GE_RAW[i])-3:] != "_GE") else QC_SAMPLE_NAME_GE.append(QC_SAMPLE_NAME_GE_RAW[i])
+    elif 'sample.name.ge' in config['Alignment_countTable_GE'] and 'input.dir.ge' in config['Alignment_countTable_GE']  and "Alignment_countTable_GE" in STEPS:
+        sys.stderr.write("Note: No sample.name.ge or input.dir.ge find in Droplets_QC_GE section of configfile; sample.name.ge and input.dir.ge will be determine from Alignment_countTable_GE step for Droplets_QC_GE step!\n")
         QC_SAMPLE_NAME_GE = copy.deepcopy(ALIGN_SAMPLE_NAME_GE)
-        QC_INPUT_DIR_GE = [
-            os.path.join(ALIGN_OUTPUT_DIR_GE, str(x), "KALLISTOBUS")
-            for x in ALIGN_SAMPLE_NAME_GE
-        ]
+        QC_INPUT_DIR_GE = [os.path.join(ALIGN_OUTPUT_DIR_GE, str(x), "KALLISTOBUS") for x in ALIGN_SAMPLE_NAME_GE]
     else:
         sys.exit("Error: No sample.name.ge or/and input.dir.ge in configfile!\n")
-
-    # Output directory handling
-    if 'Droplets_QC_GE' in config and 'output.dir.ge' in config['Droplets_QC_GE']:
+    if 'Droplets_QC_GE' in config and 'output.dir.ge' in config['Droplets_QC_GE'] :
         QC_OUTPUT_DIR_GE = config['Droplets_QC_GE']['output.dir.ge']
+    elif 'Droplets_QC_GE' in config and 'sample.name.ge' in config['Droplets_QC_GE'] and 'input.dir.ge' not in config['Droplets_QC_GE'] and "output.dir.ge" in config["Alignment_countTable_GE"]:
+        ALIGN_OUTPUT_DIR_GE = os.path.normpath(config['Alignment_countTable_GE']['output.dir.ge'])
+        QC_OUTPUT_DIR_GE = [os.path.join(f"{ALIGN_OUTPUT_DIR_GE}/{x}") for x in QC_SAMPLE_NAME_GE]
+    elif 'output.dir.ge' in config['Alignment_countTable_GE'] :
+        QC_OUTPUT_DIR_GE = [os.path.join(ALIGN_OUTPUT_DIR_GE, str(x)) for x in ALIGN_SAMPLE_NAME_GE]
+        sys.stderr.write("Note: No output.dir.ge find in Droplets_QC_GE section of configfile; output.dir.ge will be determine from Alignment_countTable_GE step for Droplets_QC_GE step!\n")
+    else :
+        sys.exit("Error: No output.dir.ge find in configfile!\n")
+####
+#    ### Sample/Project
+#    if 'Droplets_QC_GE' in config:
+#        if 'sample.name.ge' in config['Droplets_QC_GE']:
+#            QC_SAMPLE_NAME_GE_RAW = config['Droplets_QC_GE']['sample.name.ge']
+#            QC_SAMPLE_NAME_GE = []
+#             for i in range(0, len(QC_SAMPLE_NAME_GE_RAW), 1):
+#                 if not QC_SAMPLE_NAME_GE_RAW[i].endswith("_GE"):
+#                     QC_SAMPLE_NAME_GE.append(QC_SAMPLE_NAME_GE_RAW[i] + "_GE")
+#                 else:
+#                     QC_SAMPLE_NAME_GE.append(QC_SAMPLE_NAME_GE_RAW[i])
+#             ALIGN_SAMPLE_NAME_GE = QC_SAMPLE_NAME_GE
+#             
+#         if 'input.dir.ge' in config['Droplets_QC_GE']:
+#             QC_INPUT_DIR_GE = config['Droplets_QC_GE']['input.dir.ge']
 
-    elif 'output.dir.ge' in config['Alignment_countTable_GE']:
-        QC_OUTPUT_DIR_GE = [
-            os.path.join(ALIGN_OUTPUT_DIR_GE, str(x)) for x in ALIGN_SAMPLE_NAME_GE
-        ]
-        sys.stderr.write(
-            "Note: No output.dir.ge found in Droplets_QC_GE section of configfile; "
-            "output.dir.ge will be determined from Alignment_countTable_GE step for Droplets_QC_GE step!\n"
-        )
-    else:
-        sys.exit("Error: No output.dir.ge found in configfile!\n")
+        #elif "Alignment_countTable_GE" in config and "output.dir.ge" in config['Alignment_countTable_GE']:
+        #    ALIGN_OUTPUT_DIR_GE = config['Alignment_countTable_GE']["output.dir.ge"]
+        #    if all(os.path.isdir(f) for f in [os.path.normpath(f"{ALIGN_OUTPUT_DIR_GE}/{x}/{x}/{x}.gene_raw_feature_bc_matrix/") for x in QC_SAMPLE_NAME_GE]):
+        #        QC_INPUT_DIR_GE = [os.path.normpath(f"{ALIGN_OUTPUT_DIR_GE}/{x}/{x}/{x}.gene_raw_feature_bc_matrix/")for x in QC_SAMPLE_NAME_GE]
 
+#         elif 'sample.name.ge' in config['Alignment_countTable_GE'] and 'input.dir.ge' in config['Alignment_countTable_GE'] and "Alignment_countTable_GE" in STEPS:
+#             sys.stderr.write(
+#             "Note: No sample.name.ge or input.dir.ge found in Droplets_QC_GE section of configfile; "
+#             "sample.name.ge and input.dir.ge will be determined from Alignment_countTable_GE step for Droplets_QC_GE step!\n")
+# 
+#             QC_SAMPLE_NAME_GE = copy.deepcopy(ALIGN_SAMPLE_NAME_GE)
+#             QC_INPUT_DIR_GE = [os.path.join(ALIGN_OUTPUT_DIR_GE, str(x), "KALLISTOBUS") for x in ALIGN_SAMPLE_NAME_GE]
+#     else:
+#        sys.exit("Error: No sample.name.ge or/and input.dir.ge in configfile!\n")
+
+#    # Output directory handling
+#    if 'Droplets_QC_GE' in config and 'output.dir.ge' in config['Droplets_QC_GE']:
+#        QC_OUTPUT_DIR_GE = config['Droplets_QC_GE']['output.dir.ge']
+#
+#    elif 'output.dir.ge' in config['Alignment_countTable_GE']:
+#        QC_OUTPUT_DIR_GE = [
+#            os.path.join(ALIGN_OUTPUT_DIR_GE, str(x)) for x in ALIGN_SAMPLE_NAME_GE
+#        ]
+#        sys.stderr.write(
+#            "Note: No output.dir.ge found in Droplets_QC_GE section of configfile; "
+#            "output.dir.ge will be determined from Alignment_countTable_GE step for Droplets_QC_GE step!\n"
+#        )
+#    else:
+#        sys.exit("Error: No output.dir.ge found in configfile!\n")
+####
     QC_SPECIES = config['Droplets_QC_GE']['species'] if ('Droplets_QC_GE' in config and 'species' in config['Droplets_QC_GE'] and config['Droplets_QC_GE']['species'] != None) else "NULL"
     QC_AUTHOR_NAME = config['Droplets_QC_GE']['author.name'].replace(", ", ",").replace(" ", "_") if ('Droplets_QC_GE' in config and 'author.name' in config['Droplets_QC_GE'] and config['Droplets_QC_GE']['author.name'] != None) else "NULL"
     QC_AUTHOR_MAIL = config['Droplets_QC_GE']['author.mail'].replace(", ", ",") if ('Droplets_QC_GE' in config and 'author.mail' in config['Droplets_QC_GE'] and config['Droplets_QC_GE']['author.mail'] != None) else "NULL"
@@ -670,6 +695,7 @@ if "Int_Clust_Markers_Annot_GE" in STEPS:
     INT_CMA_KEEP_RES = str(INT_CMA_KEEP_RES).replace(".0", "").replace(",0","")
     INT_CMA_CFR_MINSCORE = config['Int_Clust_Markers_Annot_GE']['cfr.minscore'] if ('Int_Clust_Markers_Annot_GE' in config and 'cfr.minscore' in config['Int_Clust_Markers_Annot_GE'] and config['Int_Clust_Markers_Annot_GE']['cfr.minscore'] != None) else "NULL"
     INT_CMA_SR_MINSCORE = config['Int_Clust_Markers_Annot_GE']['sr.minscore'] if ('Int_Clust_Markers_Annot_GE' in config and 'sr.minscore' in config['Int_Clust_Markers_Annot_GE'] and config['Int_Clust_Markers_Annot_GE']['sr.minscore'] != None) else "NULL"
+    INT_ANNOTATION_BOOL = config.get('Int_Clust_Markers_Annot_GE',{}).get('int.annotation.bool',"FALSE")
     # Metadata file
     INT_CMA_METADATA_FILE = config['Int_Clust_Markers_Annot_GE']['metadata.file'].replace(", ", ",") if ('Int_Clust_Markers_Annot_GE' in config and 'metadata.file' in config['Int_Clust_Markers_Annot_GE'] and config['Int_Clust_Markers_Annot_GE']['metadata.file'] != None) else "NULL"
     ### Snakefile parameters

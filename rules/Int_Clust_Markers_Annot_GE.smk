@@ -61,7 +61,8 @@ rule int_clust_markers_annot_ge:
         INT_CMA_KEEP_DIM = INT_CMA_KEEP_DIM,
         INT_CMA_KEEP_RES = INT_CMA_KEEP_RES,
         INT_CMA_CFR_MINSCORE = INT_CMA_CFR_MINSCORE,
-        INT_CMA_SR_MINSCORE = INT_CMA_SR_MINSCORE
+        INT_CMA_SR_MINSCORE = INT_CMA_SR_MINSCORE,
+        INT_ANNOTATION_BOOL = INT_ANNOTATION_BOOL
 
     threads:
         1
@@ -88,6 +89,7 @@ rule int_clust_markers_annot_ge:
         --keep.res {params.INT_CMA_KEEP_RES} \
         --cfr.minscore {params.INT_CMA_CFR_MINSCORE} \
         --sr.minscore {params.INT_CMA_SR_MINSCORE} \
-        --metadata.file {params.SING_INT_CMA_METADATA_FILE} && \
+        --metadata.file {params.SING_INT_CMA_METADATA_FILE} \
+        --annotation.bool {params.INT_ANNOTATION_BOOL} && \
         rm -r $TMP_DIR || rm -r $TMP_DIR
         """

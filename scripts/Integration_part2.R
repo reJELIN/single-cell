@@ -25,7 +25,8 @@ option_list <- list(
   make_option("--cfr.minscore", help="Minimum correlation score for clustifyr to consider"),
   make_option("--sr.minscore", help="Minimum correlation score for SingleR to consider"),
   ### Yaml parameters file to remplace all parameters before (usefull to use R script without snakemake)
-  make_option("--yaml", help="Patho to yaml file with all parameters")
+  make_option("--yaml", help="Patho to yaml file with all parameters"),
+  make_option("--annotation.bool", type="character", help="boolean to activate annotation")
 )
 parser <- OptionParser(usage="Rscript %prog [options]", description = " ", option_list = option_list)
 args <- parse_args(parser, positional_arguments = 0)
@@ -57,6 +58,7 @@ metadata.file <- unlist(stringr::str_split(args$options$metadata.file, ","))
 keep.dims <- if (!is.null(args$options$keep.dims)) as.numeric(args$options$keep.dims)
 keep.res <- if (!is.null(args$options$keep.res)) as.numeric(args$options$keep.res)
 # Annotation
+#annotation.bool <- as.logical(tolower(args$options$annotation.bool))
 custom.sce.ref <- if (!is.null(args$options$custom.sce.ref)) unlist(stringr::str_split(args$options$custom.sce.ref, ","))
 custom.markers.ref <- if (!is.null(args$options$custom.markers.ref)) unlist(stringr::str_split(args$options$custom.markers.ref, ","))
 cfr.minscore <- if (!is.null(args$options$cfr.minscore)) as.numeric(args$options$cfr.minscore)
@@ -215,9 +217,10 @@ if(!is.null(markers)) sobj <- markers.umap.plot(sobj = sobj, markers = markers, 
 
 ### Materials and Methods
 sobj@misc$parameters$Materials_and_Methods$Integration_Clust_Markers_Annot <- paste0(
-  "An automatic annotation of cell types was perfom by SingleR (version ",sobj@misc$technical_info$SingleR,") (with fine-tuning step) and ClustifyR (version ",sobj@misc$technical_info$clustifyr,"), using packages built-in references. It labels clusters (or cells) from a dataset based on similarity (Spearman correlation score) to a reference dataset with known labels. The labels with a correlation score greater than ",sr.minscore," for SingleR or greater than ",cfr.minscore," for ClustifyR were kept. The annotation was also made CelliD (version ",sobj@misc$technical_info$CelliD,") with genes signatures from pangloa database. ",
-  "Marker genes for Louvain clusters and samples, were identified through a «one versus others» differential analysis using the Wilcoxon test through the FindAllMarkers() function from Seurat, considering only genes with a minimum log fold-change of 0.5 in at least 75% of cells from one of the groups compared, and FDR-adjusted p-values <0.05 (Benjaminin-Hochberg method)."
+    "An automatic annotation of cell types was perfom by SingleR (version ",sobj@misc$technical_info$SingleR,") (with fine-tuning step) and ClustifyR (version ",sobj@misc$technical_info$clustifyr,"), using packages built-in references. It labels clusters (or cells) from a dataset based on similarity (Spearman correlation score) to a reference dataset with known labels. The labels with a correlation score greater than ",sr.minscore," for SingleR or greater than ",cfr.minscore," for ClustifyR were kept. The annotation was also made CelliD (version ",sobj@misc$technical_info$CelliD,") with genes signatures from pangloa database. ",
+     "Marker genes for Louvain clusters and samples, were identified through a «one versus others» differential analysis using the Wilcoxon test through the FindAllMarkers() function from Seurat, considering only genes with a minimum log fold-change of 0.5 in at least 75% of cells from one of the groups compared, and FDR-adjusted p-values <0.05 (Benjaminin-Hochberg method)."
 )
+    
 sobj@misc$parameters$Materials_and_Methods$References_packages <- find_ref(MandM = sobj@misc$parameters$Materials_and_Methods, pipeline.path = pipeline.path)
 write_MandM(sobj=sobj, output.dir=clust.dir)
 
